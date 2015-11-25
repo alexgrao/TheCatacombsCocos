@@ -1,6 +1,7 @@
 #include "MainMenuScene.h"
-#include "GameScene.h"
+#include "GameMenu.h"
 #include "MyFunctions.h"
+#include "Assets.h"
 #include <string>
 
 USING_NS_CC;
@@ -33,18 +34,18 @@ bool MainMenuScene::init()
 
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 
-	auto background = Sprite::create("images/Menu/Background.png");
+	auto background = Sprite::create(Assets::MenuBackground);
 	MyFunctions::SetSprite(background, 0, 0, 100, 100);
 	addChild(background, 0);
 
 	// menu title
-	auto title = Sprite::create("images/Menu/Game_Title.png");
+	auto title = Sprite::create(Assets::MenuTitle);
 	MyFunctions::SetSprite(title, 30, 70, 50, 15);
 	addChild(title, 1);
 
 	// Creating menu
-	auto playItem = MenuItemImage::create("images/Menu/Play_Button.png",
-		"images/MainMenuScreen/Play_Button(Click).png",
+	auto playItem = MenuItemImage::create(Assets::PlayButton,
+		Assets::PlayButtonClicked,
 		CC_CALLBACK_1(MainMenuScene::Play, this));
 	auto menu = Menu::create(playItem, NULL);
 	menu->alignItemsVerticallyWithPadding(visibleSize.height / 4);
@@ -63,7 +64,7 @@ bool MainMenuScene::init()
 
 void MainMenuScene::Play(Ref *pSender)
 {
-	auto scene = GameScene::createScene();
+	auto scene = GameMenu::createScene();
 	Director::getInstance()->replaceScene(scene);
 }
 

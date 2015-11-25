@@ -10,6 +10,7 @@ class CentSprite
 {
 private:
 	float x, y, width, height;
+	int orderZ;
 
 public:
 	Sprite* sprite;
@@ -17,10 +18,18 @@ public:
 	void SetSize(float, float);
 	Vector2 GetPosition();
 	Vector2 GetSize();
+	const char* Tag;
+	void SetOpacity(GLubyte);
+	int GetOrderZ();
+	void SetOrderZ(int);
 	
 	CentSprite();
 	CentSprite(Sprite*, float, float, float, float);
+	CentSprite(const char*, float, float, float, float);
 	CentSprite(char*, float, float, float, float);
+	CentSprite(Sprite*, float, float, float, float, int);
+	CentSprite(const char*, float, float, float, float, int);
+	CentSprite(char*, float, float, float, float, int);
 
 };
 

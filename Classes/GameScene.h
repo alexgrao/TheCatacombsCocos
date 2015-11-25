@@ -6,26 +6,56 @@
 #include "Laberynth.h"
 #include "CentSprite.h"
 #include "Enemy.h"
+#include "Vector2F.h"
 #include <vector>
+#include "CatacombTimer.h"
 
 USING_NS_CC;
 
 class GameScene : public cocos2d::Layer
 {
 private:
+	int catacomb = 1;
+	int level = 1;
+
 	Label* debugg;
 	Laberynth laberynth;
-	//std::vector<Sprite*> walls;
-	std::vector<CentSprite*> walls;
+
+	// PlayerControl
 	Player player;
-	Enemy enemy1;
-	void findView();
-	void updateView();
 	void checkPlayerDirections();
-	void checkEnemyDirections(Enemy);
+	void loadPlayer();
+
+	// for weapon
+	Sprite* cross;
+	Vector2F recoil;
+	Vector2F mousePosition;
+	Vector2F delta;
+	
+	// Graphics
+	std::vector<CentSprite*> walls;
+	std::vector<CentSprite*> enemiesSprites;
+	void findView();
+	void findEnemyView(int);
+	void updateView();
+	void DeleteEverything();
+
+	// Enemies
+	void findEnemies();
+	std::vector<Enemy*> enemies;
+	void checkPressedOnEnemies(int, int);
+
+	// Cycle System
+	float time; // tiempo desde que empezamos el juego en segundos
+	CatacombTimer cycle; // temporizador del ciclo de refresco
+	
 
 public:
 	void onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event);
+	void OnMouseMove(Event *event);
+	void OnMouseDown(Event *event);
+	void PauseGame(Ref *pSender);
+	void BackToMenu(Ref *pSender);
 
 	static cocos2d::Scene* createScene();
 
@@ -33,6 +63,8 @@ public:
 
 	// implement the "static create()" method manually
 	CREATE_FUNC(GameScene);
+
+	void update(float) override;
 
 };
 

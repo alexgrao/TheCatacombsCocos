@@ -1,8 +1,6 @@
 #ifndef __PLAYER_SCENE_H__
 #define __PLAYER_SCENE_H__
 
-using namespace std;
-
 #include "cocos2d.h"
 #include "Vector2.h"
 
@@ -14,8 +12,8 @@ public:
 	Vector2 Direction;
 	Vector2 Left;
 	float Battery;
-	bool canForward;
-	bool canBackward;
+	bool canForward = true;
+	bool canBackward = false;
 
 	// funciones
 	Player();

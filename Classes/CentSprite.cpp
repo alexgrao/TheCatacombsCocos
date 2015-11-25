@@ -3,14 +3,16 @@
 #include "MyFunctions.h"
 #include "Vector2.h"
 
-CentSprite::CentSprite(Sprite* _sprite, float _x, float _y, float _width, float _height)
+CentSprite::CentSprite(const char* spriteFile, float _x, float _y, float _width, float _height)
 {
-	sprite = _sprite;
+	sprite = Sprite::create(spriteFile);
 	x = _x;
 	y = _y;
 	width = _width;
 	height = _height;
 	MyFunctions::SetSprite(sprite, x, y, width, height);
+	Tag = "";
+	orderZ = 2;
 }
 
 CentSprite::CentSprite(char* spriteFile, float _x, float _y, float _width, float _height)
@@ -21,7 +23,59 @@ CentSprite::CentSprite(char* spriteFile, float _x, float _y, float _width, float
 	width = _width;
 	height = _height;
 	MyFunctions::SetSprite(sprite, x, y, width, height);
+	Tag = "";
+	orderZ = 2;
 }
+
+CentSprite::CentSprite(Sprite* _sprite, float _x, float _y, float _width, float _height)
+{
+	sprite = _sprite;
+	x = _x;
+	y = _y;
+	width = _width;
+	height = _height;
+	MyFunctions::SetSprite(sprite, x, y, width, height);
+	Tag = "";
+	orderZ = 2;
+}
+
+CentSprite::CentSprite(const char* spriteFile, float _x, float _y, float _width, float _height, int order)
+{
+	sprite = Sprite::create(spriteFile);
+	x = _x;
+	y = _y;
+	width = _width;
+	height = _height;
+	MyFunctions::SetSprite(sprite, x, y, width, height);
+	Tag = "";
+	orderZ = order;
+}
+
+CentSprite::CentSprite(char* spriteFile, float _x, float _y, float _width, float _height, int order)
+{
+	sprite = Sprite::create(spriteFile);
+	x = _x;
+	y = _y;
+	width = _width;
+	height = _height;
+	MyFunctions::SetSprite(sprite, x, y, width, height);
+	Tag = "";
+	orderZ = order;
+}
+
+CentSprite::CentSprite(Sprite* _sprite, float _x, float _y, float _width, float _height, int order)
+{
+	sprite = _sprite;
+	x = _x;
+	y = _y;
+	width = _width;
+	height = _height;
+	MyFunctions::SetSprite(sprite, x, y, width, height);
+	Tag = "";
+	orderZ = order;
+}
+
+///////// FIN CONSTRUCTORES
 
 void CentSprite::SetPosition(float _x, float _y)
 {
@@ -57,3 +111,12 @@ void CentSprite::SetSize(float _width, float _height)
 Vector2 CentSprite::GetPosition() { return Vector2(x, y); }
 
 Vector2 CentSprite::GetSize() { return Vector2(x, y); }
+
+void CentSprite::SetOpacity(GLubyte opacity) { sprite->setOpacity(opacity); }
+
+int CentSprite::GetOrderZ() { return orderZ; }
+void CentSprite::SetOrderZ(int order)
+{
+	orderZ = order;
+	sprite->setZOrder(orderZ);
+}

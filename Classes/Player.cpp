@@ -11,8 +11,6 @@ Player::Player(int x, int y)
 {
 	Position.x = x;
 	Position.y = y;
-	bool canForward = true;
-	bool canBackward = false;
 }
 
 void Player::turnLeft()

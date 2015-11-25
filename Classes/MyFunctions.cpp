@@ -26,3 +26,13 @@ void MyFunctions::SetSprite(cocos2d::Sprite* sprite, float x, float y, float wid
 		//sprite->setPosition(Point(positionX + sizeX / 1.78, screenSize.height - positionY - sizeY / 2));
 	}
 }
+
+bool MyFunctions::IsIn(int x, int y, CentSprite* cs)
+{
+	if (x < cs->GetPosition().x) return false;
+	if (x > cs->GetPosition().x + cs->GetSize().x) return false;
+	if (y < cs->GetPosition().y) return false;
+	if (y > cs->GetPosition().y + cs->GetSize().y) return false;
+
+	return true;
+}
