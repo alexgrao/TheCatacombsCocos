@@ -13,6 +13,7 @@ public:
 	Vector2F();
 	Vector2F(float, float);
 	Vector2F Copy();
+	void Set(float, float);
 };
 
 #endif

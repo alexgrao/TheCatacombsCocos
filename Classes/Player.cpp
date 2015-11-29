@@ -11,6 +11,7 @@ Player::Player(int x, int y)
 {
 	Position.x = x;
 	Position.y = y;
+	timer = CatacombTimer(1);
 }
 
 void Player::turnLeft()

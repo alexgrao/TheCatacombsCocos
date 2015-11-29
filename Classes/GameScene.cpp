@@ -8,6 +8,7 @@
 #include <vector>
 #include "PauseScene.h"
 #include "GameMenu.h"
+#include "CatacombTimer.h"
 
 USING_NS_CC;
 using namespace std;
@@ -63,10 +64,10 @@ bool GameScene::init()
 	findEnemies();
 
 	// DEBUGG LABEL
-	debugg = Label::createWithTTF("Tiempo: 0", "fonts/Marker Felt.ttf", 32);
-	debugg->setPosition(Point(visibleSize.width / 2, visibleSize.height*0.6));
+	debugg = Label::createWithTTF("Tiempo: 0", "fonts/Marker Felt.ttf", 15);
+	debugg->setPosition(Point(visibleSize.width * 0.6, visibleSize.height*0.6));
 	debugg->setColor(ccc3(255, 0, 0));
-	this->addChild(debugg, 5);
+	this->addChild(debugg, 20);
 
 	// Update walls view
 	updateView();
@@ -82,6 +83,11 @@ bool GameScene::init()
 	recoil = Vector2F(0, 0);
 	mousePosition = Vector2F(0, 0);
 	delta = Vector2F(0, 0);
+
+	lanternShadow = Sprite::create(Assets::LanternShadow);
+	//lanternShadow->setScale(1);
+	lanternShadow->setOpacity(240);
+	addChild(lanternShadow, 15);
 
 	// MOUSE EVENT FOR CROSS
 	auto listenerMouse = EventListenerMouse::create();
@@ -135,9 +141,9 @@ void GameScene::findEnemies()
 				e->SearchInitialDirection(&laberynth);
 				laberynth.Set(i, j, enemies.size()-1 + 10);
 
-				Sprite* enemySprite = Sprite::create(e->GetSprite());
-				enemiesSprites.push_back(new CentSprite(enemySprite, 0, 0, 0, 0));
-				addChild(enemySprite);
+				CentSprite* cs = new CentSprite(e->GetSprite(), 0, 0, 0, 0);
+				e->sprite = cs;
+				addChild(cs->sprite);
 			}
 		}
 	}
@@ -175,17 +181,6 @@ void GameScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
 		break;
 	case EventKeyboard::KeyCode::KEY_ESCAPE:
 		PauseGame(this);
-		break;
-	// ESTOS SON PARA TESTEAR, QUITAR LUEGO
-	case EventKeyboard::KeyCode::KEY_E:
-		++enemies[0]->channel;
-		if (enemies[0]->channel == 4) enemies[0]->channel = 0;
-		findEnemyView(0);
-		break;
-	case EventKeyboard::KeyCode::KEY_Q:
-		--enemies[0]->channel;
-		if (enemies[0]->channel == -1) enemies[0]->channel = 3;
-		findEnemyView(0);
 		break;
 	}
 }
@@ -523,19 +518,19 @@ void GameScene::findEnemyView(int i)
 	// Si no está lateralmente visible
 	if (distanceLateral < -1 || distanceLateral > 1)
 	{
-		enemiesSprites[i]->SetPosition(-100, -100);
+		e->NotVisible();
 		return;
 	}
 
 	// si el jugador mira en dirección contraria
 	if (distanceFrontal > 0 && sense > 0)
 	{
-		enemiesSprites[i]->SetPosition(-100, -100);
+		e->NotVisible();
 		return;
 	}
 	if (distanceFrontal < 0 && sense < 0)
 	{
-		enemiesSprites[i]->SetPosition(-100, -100);
+		e->NotVisible();
 		return;
 	}
 
@@ -544,65 +539,22 @@ void GameScene::findEnemyView(int i)
 	// si está demasiado lejos
 	if (distanceFrontal > 4)
 	{
-		enemiesSprites[i]->SetPosition(-100, -100);
+		e->NotVisible();
 		return;
 	}
 	if (distanceFrontal < 0)
 	{
-		enemiesSprites[i]->SetPosition(-100, -100);
+		e->NotVisible();
 		return;
 	}
 
-	enemiesSprites[i]->SetOrderZ(7 - distanceFrontal);
+	if (e->DistanceToCamera().x > distanceFrontal)
+		e->sprite->SetOrderZ(7 - distanceFrontal);
+	else
+		e->sprite->SetOrderZ(7 - e->DistanceToCamera().x);
 
-	switch (distanceFrontal)
-	{
-	case 0:
-		if (distanceLateral == 0)
-		{
-			enemiesSprites[i]->SetPosition(20, 20);
-			enemiesSprites[i]->SetSize(60, 60);
-		}
-		break;
-	case 1:
-		if (distanceLateral == -1)
-			enemiesSprites[i]->SetPosition(-55 + 20 * e->channel, -1);
-		else if (distanceLateral == 0)
-			enemiesSprites[i]->SetPosition(7 + 20 * e->channel, -1);
-		else if (distanceLateral == 1)
-			enemiesSprites[i]->SetPosition(75 + 20 * e->channel, -1);
-		enemiesSprites[i]->SetSize(27, 33.75);
-		break;
-	case 2:
-		if (distanceLateral == -1)
-			enemiesSprites[i]->SetPosition(-25 + 13 * e->channel, 21.7);
-		else if (distanceLateral == 0)
-			enemiesSprites[i]->SetPosition(20 + 13 * e->channel, 21.7);
-		else if (distanceLateral == 1)
-			enemiesSprites[i]->SetPosition(65 + 13 * e->channel, 21.7);
-		enemiesSprites[i]->SetSize(18, 22.5);
-		break;
-	case 3:
-		if (distanceLateral == -1)
-			enemiesSprites[i]->SetPosition(-5 + 9.1 * e->channel, 33);
-		else if (distanceLateral == 0)
-			enemiesSprites[i]->SetPosition(30 + 9.1 * e->channel, 33);
-		else if (distanceLateral == 1)
-			enemiesSprites[i]->SetPosition(65 + 9.1 * e->channel, 33);
-		enemiesSprites[i]->SetSize(12, 15);
-		break;
-	case 4:
-		if (distanceLateral == -1)
-			enemiesSprites[i]->SetPosition(5 + 7.5 * e->channel, 38.5);
-		else if (distanceLateral == 0)
-			enemiesSprites[i]->SetPosition(35 + 7.5 * e->channel, 38.5);
-		else if (distanceLateral == 1)
-			enemiesSprites[i]->SetPosition(65 + 7.5 * e->channel, 38.5);
-		enemiesSprites[i]->SetSize(8, 10);
-		break;
-	default:
-		enemiesSprites[i]->SetPosition(-100,-100);
-	}
+	if (distanceFrontal != 0)
+		e->SetDistanceToCamera(distanceFrontal, distanceLateral + 2);
 }
 
 void GameScene::updateView()
@@ -631,20 +583,30 @@ void GameScene::update(float delta)
 	for (int i = 0; i < enemies.size(); ++i)
 	{
 		Enemy* e = enemies[i];
-		if (e->GetLifes() > 0 && e->CheckTimer(delta))
+		if (e->GetLifes() > 0)
 		{
+			if (e->CheckTimer(delta))
+			{
+				Vector2 prev = e->Position.Copy();
+				e->whereIgo(&laberynth);
+				e->stepForward();
+				laberynth.MoveEnemy(prev.x, prev.y, e->Position.x, e->Position.y);
+				findEnemyView(i);
+				e->UpdateSprite();
+			}
+			else
+			{
+				e->UpdateSprite();
+			}
 
-			Vector2 prev = e->Position.Copy();
-			e->whereIgo(&laberynth);
-			e->stepForward();
-			laberynth.MoveEnemy(prev.x, prev.y, e->Position.x, e->Position.y);
-			findEnemyView(i);
+			debugg->setString(std::to_string(e->DistanceToCamera().x));
 		}
 	}
 
 	// cross movement
 
 	cross->setPosition(Vec2(mousePosition.x + recoil.x, mousePosition.y + recoil.y));
+	lanternShadow->setPosition(Vec2(mousePosition.x + recoil.x, mousePosition.y + recoil.y));
 	recoil.x *= 0.99;
 	recoil.y *= 0.95;
 	if (recoil.x < 1) recoil.x = 0;
@@ -690,23 +652,19 @@ void GameScene::checkPressedOnEnemies(int x, int y)
 	float percentageX = x * 100 / screenSize.width; // x = z%Screen.width  z = x*100 / Screen.width
 	float percentageY = y * 100 / screenSize.height;
 
-	for (int i = 0; i < enemiesSprites.size(); ++i)
+	for (int i = 0; i < enemies.size(); ++i)
 	{
-		CentSprite* cs = enemiesSprites[i];
-		if (cs->GetPosition().x < 0) continue;
+		Enemy* e = enemies[i];
+		if (e->sprite->GetPosition().x < 0) continue;
 
-		if (MyFunctions::IsIn(percentageX, percentageY, cs))
+		if (MyFunctions::IsIn(percentageX, percentageY, e->sprite))
 		{
-			Enemy* e = enemies[i];
 			if (e->Damage())
 			{
-				debugg->setString("Muerto!");
 				laberynth.Set(e->Position.x, e->Position.y, 0);
-				cs->SetPosition(-100, -100);
-				removeChild(cs->sprite);
+				e->sprite->SetPosition(-100, -100);
+				removeChild(e->sprite->sprite);
 			}
-			else
-				debugg->setString("Shot! Quedan " + std::to_string(enemies[i]->GetLifes()));
 		}
 	}
 }
@@ -722,12 +680,11 @@ void GameScene::DeleteEverything()
 
 	for (int i = 0; i < enemies.size(); ++i)
 	{
-		removeChild(enemiesSprites[i]->sprite);
-		delete(enemiesSprites[i]);
+		removeChild(enemies[i]->sprite->sprite);
+		delete(enemies[i]->sprite);
 		delete(enemies[i]);
 	}
 	enemies.clear();
-	enemiesSprites.clear();
 
 
 

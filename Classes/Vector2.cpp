@@ -18,3 +18,9 @@ Vector2 Vector2::Copy()
 {
 	return Vector2(x, y);
 }
+
+void Vector2::Set(int _x, int _y)
+{
+	x = _x;
+	y = _y;
+}

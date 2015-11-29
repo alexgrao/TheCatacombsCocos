@@ -21,6 +21,7 @@ public:
 	static const char* Assets::Cross;
 	static const char* Assets::Shadow;
 	static const char* Assets::ShadowOverWall;
+	static const char* Assets::LanternShadow;
 	//Enemies
 	static const char* Assets::Rat;
 	//Game menu

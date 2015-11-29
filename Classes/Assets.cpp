@@ -16,6 +16,7 @@ const char* Assets::Downstairs = "images/GameScreen/Downstairs.jpg";
 const char* Assets::Cross = "images/GameScreen/Cross.png";
 const char* Assets::Shadow = "images/GameScreen/shadow.png";
 const char* Assets::ShadowOverWall = "images/GameScreen/shadowOverWall.png";
+const char* Assets::LanternShadow = "images/GameScreen/lanternShadow.png";
 
 // Enemies
 const char* Assets::Rat = "images/Enemies/Rat/Rat.png";

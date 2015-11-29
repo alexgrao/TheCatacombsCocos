@@ -42,7 +42,7 @@ void CatacombTimer::Restart()
 	running = true;
 }
 
-float CatacombTimer::GetCurrentTime() { return currentTime; }
+float CatacombTimer::GetTime() { return currentTime; }
 
 float CatacombTimer::GetInterval() { return interval; }
 

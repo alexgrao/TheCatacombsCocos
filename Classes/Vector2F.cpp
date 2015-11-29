@@ -18,3 +18,9 @@ Vector2F Vector2F::Copy()
 {
 	return Vector2F(x, y);
 }
+
+void Vector2F::Set(float _x, float _y)
+{
+	x = _x;
+	y = _y;
+}

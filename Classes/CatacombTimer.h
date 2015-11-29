@@ -18,7 +18,7 @@ public:
 	void Reset();
 	void Restart();
 
-	float GetCurrentTime();
+	float GetTime();
 	float GetInterval();
 	void SetInterval(float);
 	float GetPercentageFull();

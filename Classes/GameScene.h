@@ -8,7 +8,6 @@
 #include "Enemy.h"
 #include "Vector2F.h"
 #include <vector>
-#include "CatacombTimer.h"
 
 USING_NS_CC;
 
@@ -31,10 +30,10 @@ private:
 	Vector2F recoil;
 	Vector2F mousePosition;
 	Vector2F delta;
+	Sprite* lanternShadow;
 	
 	// Graphics
 	std::vector<CentSprite*> walls;
-	std::vector<CentSprite*> enemiesSprites;
 	void findView();
 	void findEnemyView(int);
 	void updateView();
@@ -45,10 +44,9 @@ private:
 	std::vector<Enemy*> enemies;
 	void checkPressedOnEnemies(int, int);
 
-	// Cycle System
+	// System
 	float time; // tiempo desde que empezamos el juego en segundos
-	CatacombTimer cycle; // temporizador del ciclo de refresco
-	
+	int ejemplo[5];
 
 public:
 	void onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event);

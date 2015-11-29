@@ -9,11 +9,13 @@ USING_NS_CC;
 
 Enemy::Enemy(void)
 {
-
+	InitVectors();
 }
 
 Enemy::Enemy(int x, int y, int vidas, int rango, float duracion)
 {
+	InitVectors();
+
 	Position.x = x;
 	Position.y = y;
 	lifes = vidas;
@@ -23,6 +25,7 @@ Enemy::Enemy(int x, int y, int vidas, int rango, float duracion)
 
 Enemy::Enemy(int id)
 {
+	InitVectors();
 	Load(id);
 }
 
@@ -154,25 +157,26 @@ void Enemy::whereIgo(Laberynth* lab)
 
 bool Enemy::CheckTimer(float delta)
 {
-	timer += delta;
-	if (timer >= duration)
-	{
-		timer = timer - duration;
-		return true;
-	}
-	return false;
+	return timer.Check(delta);
 }
 
 void Enemy::Load(int id)
 {
+	ID = id;
+
 	switch (id)
 	{
 	case 1:
-		timer = CatacombTimer(1);
+		timer = CatacombTimer(1.5);
 		lifes = 3;
 		imageSprite = Assets::Rat;
 		range = 1;
 		channel = 0;
+
+		SetScreenPositions(id);
+
+		break;
+
 	}
 }
 
@@ -228,7 +232,7 @@ void Enemy::SearchInitialDirection(Laberynth* lab)
 	Left.y = 0;
 }
 
-double Enemy::GetTime() { return timer; }
+double Enemy::GetTime() { return timer.GetTime(); }
 
 Vector2 Enemy::GetInitialPosition() { return initialPosition.Copy(); }
 
@@ -251,3 +255,119 @@ bool Enemy::Damage(int n)
 bool Enemy::Damage() { return Damage(1); }
 
 int Enemy::GetLifes() { return lifes; }
+
+void Enemy::SetDistanceToCamera(int frontal, int lateral)
+{
+	distanceToCamera->Set(frontal, lateral);
+
+	// Position transition
+
+	int index = (frontal - 1) * 3 + (lateral - 1);
+	Vector2 nextPosition = Vector2(positions[index]->x, positions[index]->y);
+
+	if (currentPosition->x != -1)
+		oldPosition->Set(currentPosition->x, currentPosition->y);
+	else
+		oldPosition->Set(nextPosition.x, nextPosition.y);
+	currentPosition->Set(nextPosition.x, nextPosition.y);
+
+	diffPosition->Set(currentPosition->x - oldPosition->x, currentPosition->y - oldPosition->y);
+
+	// Size transition
+
+	if (currentSize->y != -1)
+		oldSize->Set(currentSize->x, currentSize->y);
+	else
+		oldSize->Set(sizes[frontal-1]->x, sizes[frontal-1]->y);
+
+	currentSize->Set(sizes[frontal-1]->x, sizes[frontal-1]->y);
+	diffSize->Set(currentSize->x - oldSize->x, currentSize->y - oldSize->y);
+}
+
+void Enemy::UpdateSprite()
+{
+	Vector2F Position = Vector2F
+		( oldPosition->x + timer.GetPercentageFull()*diffPosition->x,
+		  oldPosition->y + timer.GetPercentageFull()*diffPosition->y);
+
+	Vector2F Size = Vector2F
+		( oldSize->x + timer.GetPercentageFull()*diffSize->x,
+		  oldSize->y + timer.GetPercentageFull()*diffSize->y);
+
+	sprite->SetPosition(Position.x, Position.y);
+	sprite->SetSize(Size.x, Size.y);
+}
+
+void Enemy::NotVisible()
+{
+	sprite->SetPosition(200, 200);
+	currentPosition->Set(-1, -1);
+	currentSize->Set(-1, -1);
+}
+
+void Enemy::SetScreenPositions(int id)
+{
+	switch (id)
+	{
+	case 1:
+
+		// Si distancia frontal es 1:
+		positions[0]->Set(-55 + 20 * channel, -1); // Si está a la izquierda
+		positions[1]->Set(7 + 20 * channel, -1); // Si está al centro
+		positions[2]->Set(75 + 20 * channel, -1); // Si está a la derecha
+		// Si distancia frontal es 2:
+		positions[3]->Set(-25 + 13 * channel, 21.7); // Si está a la izquierda
+		positions[4]->Set(20 + 13 * channel, 21.7); // Si está al centro
+		positions[5]->Set(65 + 13 * channel, 21.7); // Si está a la derecha
+		// Si distancia frontal es 3:
+		positions[6]->Set(-5 + 9.1 * channel, 33); // Si está a la izquierda
+		positions[7]->Set(30 + 9.1 * channel, 33); // Si está al centro
+		positions[8]->Set(65 + 9.1 * channel, 33); // Si está a la derecha
+		// Si distancia frontal es 4:
+		positions[9]->Set(5 + 7.5 * channel, 38.5); // Si está a la izquierda
+		positions[10]->Set(35 + 7.5 * channel, 38.5); // Si está al centro
+		positions[11]->Set(65 + 7.5 * channel, 38.5); // Si está a la derecha
+
+		// TAMAÑOS
+		sizes[0]->Set(27, 33.75);
+		sizes[1]->Set(18, 22.5);
+		sizes[2]->Set(12, 15);
+		sizes[3]->Set(8, 10);
+
+		break;
+
+	}
+}
+
+void Enemy::SetChannel(int cnnel)
+{
+	channel = cnnel;
+	SetScreenPositions(ID);
+}
+
+void Enemy::InitVectors()
+{
+	oldPosition = new Vector2F(-1, -1);
+	currentPosition = new Vector2F(-1, -1);
+	oldSize = new Vector2F(-1, -1);
+	currentSize = new Vector2F(-1, -1);
+	diffPosition = new Vector2F(-1, -1);
+	diffSize = new Vector2F(-1, -1);
+
+	distanceToCamera = new Vector2();
+
+	for (int i = 0; i < 12; ++i)
+		positions[i] = new Vector2F();
+	for (int i = 0; i < 4;++i)
+		sizes[i] = new Vector2F();
+}
+
+string Enemy::GetAnimationInfo()
+{
+	string info = "From (" + std::to_string(oldPosition->x) + ", " + std::to_string(oldPosition->y) + ") to (" + std::to_string(currentPosition->x) + ", " + std::to_string(currentPosition->y) + ")";
+	info += "\n we're at (" + std::to_string(sprite->GetPosition().x) + ", " + std::to_string(sprite->GetPosition().y);
+
+	return info;
+}
+
+Vector2 Enemy::DistanceToCamera() { return Vector2(distanceToCamera->x, distanceToCamera->y); }

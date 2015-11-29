@@ -3,9 +3,12 @@
 
 #include "cocos2d.h"
 #include "Vector2.h"
+#include "CatacombTimer.h"
 
 class Player
 {
+private:
+	CatacombTimer timer;
 public:
 	// variables
 	Vector2 Position;

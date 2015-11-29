@@ -13,6 +13,7 @@ public:
 	Vector2();
 	Vector2(int, int);
 	Vector2 Copy();
+	void Set(int, int);
 };
 
 #endif
