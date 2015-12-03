@@ -11,7 +11,6 @@ Player::Player(int x, int y)
 {
 	Position.x = x;
 	Position.y = y;
-	timer = CatacombTimer(1);
 }
 
 void Player::turnLeft()
@@ -51,3 +50,34 @@ void Player::stepBackward()
 		Position.y -= Direction.y;
 	}
 }
+
+float Player::GetBattery()
+{
+	return battery;
+}
+
+void Player::RefillBattery() { battery = 100; }
+
+void Player::AddBattery(float quantity)
+{
+	battery += quantity;
+	if (battery > 100) battery = 100;
+	else if (battery < 0) battery = 0;
+}
+
+void Player::AddBullets(int tipo, int quantity)
+{
+	bullets[tipo] += quantity;
+}
+
+void Player::AddBengalas(int color, int quantity)
+{
+	bengalas[color] += quantity;
+}
+
+int Player::BulletsCount(int tipo) { return bullets[tipo]; }
+
+int Player::BengalasCount(int color) { return bengalas[color]; }
+
+// Timer for animation
+

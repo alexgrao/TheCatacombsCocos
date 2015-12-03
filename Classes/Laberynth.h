@@ -25,6 +25,8 @@ public:
 	bool isWall(int, int);
 	bool isWall(Vector2);
 	bool isExitEntrance(int, int);
+	bool isExit(int, int);
+	bool isEntrance(int, int);
 	bool isIn(int, int);
 	bool isEnemy(int, int);
 	void Load(int, int);

@@ -18,6 +18,20 @@ bool Laberynth::isExitEntrance(int x, int y)
 	return false;
 }
 
+bool Laberynth::isExit(int x, int y)
+{
+	if (labMatrix[x][y] == 4)
+		return true;
+	return false;
+}
+
+bool Laberynth::isEntrance(int x, int y)
+{
+	if (labMatrix[x][y] == 3)
+		return true;
+	return false;
+}
+
 bool Laberynth::isWall(Vector2 vec)
 {
 	return isWall(vec.x, vec.y);
@@ -51,6 +65,31 @@ void Laberynth::Set(int x, int y, int n)
 // Cargar laberintos diseñados
 void Laberynth::Load(int catacomb, int level)
 {
+	if (catacomb == 0 && level == 0)
+	{
+		//Catacumba: 1, nivel: 1
+		size.x = 7;
+		size.y = 7;
+		labMatrix = new int*[7];
+		labMatrix[0] = new int[7]{ 1, 1, 1, 1, 1, 1, 1 };
+
+		labMatrix[1] = new int[7]{ 1, 0, 0, 1, 0, 0, 1 };
+
+		labMatrix[2] = new int[7]{ 3, 0, 0, 0, 1, 0, 1 };
+
+		labMatrix[3] = new int[7]{ 1, 0, 0, 1, 0, 0, 1 };
+
+		labMatrix[4] = new int[7]{ 1, 0, 0, 0, 0, 0, 4 };
+
+		labMatrix[5] = new int[7]{ 1, 0, 0, 0, 0, 0, 1 };
+
+		labMatrix[6] = new int[7]{ 1, 1, 1, 1, 1, 1, 1 };
+
+		findFields();
+
+		return;
+	}
+
 	switch (catacomb)
 	{
 	case 1:
@@ -58,54 +97,323 @@ void Laberynth::Load(int catacomb, int level)
 		{
 		case 1:
 			//Catacumba: 1, nivel: 1
-			size.x = 8;
-			size.y = 8;
-			labMatrix = new int*[8];
-			labMatrix[0] = new int[8]{ 1, 1, 1, 1, 1, 3, 1, 1 };
+			size.x = 12;
+			size.y = 12;
+			labMatrix = new int*[12];
+			labMatrix[0] = new int[12]{ 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
-			labMatrix[1] = new int[8]{ 1, 0, 0, 0, 1, 0, 1, 1 };
+			labMatrix[1] = new int[12]{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1 };
 
-			labMatrix[2] = new int[8]{ 1, 0, 1, 0, 1, 0, 1, 1 };
+			labMatrix[2] = new int[12]{ 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1 };
 
-			labMatrix[3] = new int[8]{ 1, 0, 1, 0, 1, 0, 1, 1 };
+			labMatrix[3] = new int[12]{ 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1 };
 
-			labMatrix[4] = new int[8]{ 1, 0, 1, 0, 0, 0, 0, 1 };
+			labMatrix[4] = new int[12]{ 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1 };
 
-			labMatrix[5] = new int[8]{ 4, 0, 1, 0, 1, 11, 1, 1 };
+			labMatrix[5] = new int[12]{ 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1 };
 
-			labMatrix[6] = new int[8]{ 1, 1, 0, 0, 1, 0, 1, 1 };
+			labMatrix[6] = new int[12]{ 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1 };
 
-			labMatrix[7] = new int[8]{ 1, 1, 1, 1, 1, 1, 1, 1 };
+			labMatrix[7] = new int[12]{ 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 };
+
+			labMatrix[8] = new int[12]{ 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1 };
+
+			labMatrix[9] = new int[12]{ 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1 };
+
+			labMatrix[10] = new int[12]{ 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1 };
+
+			labMatrix[11] = new int[12]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1 };
+
 
 			break;
 
 		case 2:
 			//Catacumba: 1, nivel: 2
-			size.x = 10;
-			size.y = 10;
-			labMatrix = new int*[10];
-			labMatrix[0] = new int[10]{ 1, 1, 1, 1, 1, 1, 3, 1, 1, 1 };
+			size.x = 12;
+			size.y = 12;
+			labMatrix = new int*[12];
+			labMatrix[0] = new int[12]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1 };
 
-			labMatrix[1] = new int[10]{ 1, 1, 1, 1, 1, 1, 0, 1, 0, 1 };
+			labMatrix[1] = new int[12]{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
 
-			labMatrix[2] = new int[10]{ 1, 1, 0, 1, 1, 1, 0, 1, 0, 1 };
+			labMatrix[2] = new int[12]{ 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1 };
 
-			labMatrix[3] = new int[10]{ 1, 1, 0, 0, 0, 0, 0, 0, 0, 1 };
+			labMatrix[3] = new int[12]{ 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1 };
 
-			labMatrix[4] = new int[10]{ 1, 1, 1, 1, 1, 1, 0, 1, 1, 1 };
+			labMatrix[4] = new int[12]{ 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1 };
 
-			labMatrix[5] = new int[10]{ 1, 1, 1, 1, 1, 1, 0, 1, 1, 1 };
+			labMatrix[5] = new int[12]{ 1, 12, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1 };
 
-			labMatrix[6] = new int[10]{ 1, 0, 1, 1, 0, 0, 0, 1, 1, 1 };
+			labMatrix[6] = new int[12]{ 1, 0, 1, 1, 1, 0, 1, 1, 11, 1, 0, 1 };
 
-			labMatrix[7] = new int[10]{ 4, 0, 1, 1, 0, 1, 0, 0, 0, 1 };
+			labMatrix[7] = new int[12]{ 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1 };
 
-			labMatrix[8] = new int[10]{ 1, 0, 0, 0, 0, 1, 1, 1, 1, 1 };
+			labMatrix[8] = new int[12]{ 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1 };
 
-			labMatrix[9] = new int[10]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+			labMatrix[9] = new int[12]{ 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1 };
 
+			labMatrix[10] = new int[12]{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1 };
+
+			labMatrix[11] = new int[12]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1 };
+
+			break;
+
+		case 3:
+			//Catacumba: 1, nivel: 3
+			size.x = 14;
+			size.y = 14;
+			labMatrix = new int*[14];
+			labMatrix[0] = new int[14]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+			labMatrix[1] = new int[14]{ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
+
+			labMatrix[2] = new int[14]{ 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[3] = new int[14]{ 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[4] = new int[14]{ 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[5] = new int[14]{ 1, 0, 1, 0, 1, 11, 1, 1, 0, 1, 13, 1, 0, 1 };
+
+			labMatrix[6] = new int[14]{ 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[7] = new int[14]{ 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[8] = new int[14]{ 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[9] = new int[14]{ 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[10] = new int[14]{ 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[11] = new int[14]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1 };
+
+			labMatrix[12] = new int[14]{ 1, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 1 };
+
+			labMatrix[13] = new int[14]{ 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+			break;
+
+		case 4:
+			//Catacumba: 1, nivel: 4
+			size.x = 14;
+			size.y = 14;
+			labMatrix = new int*[14];
+			labMatrix[0] = new int[14]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+			labMatrix[1] = new int[14]{ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
+
+			labMatrix[2] = new int[14]{ 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[3] = new int[14]{ 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[4] = new int[14]{ 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[5] = new int[14]{ 1, 0, 1, 0, 1, 11, 1, 1, 0, 1, 0, 1, 14, 1 };
+
+			labMatrix[6] = new int[14]{ 1, 0, 1, 0, 1, 0, 1, 1, 12, 1, 0, 1, 0, 1 };
+
+			labMatrix[7] = new int[14]{ 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[8] = new int[14]{ 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[9] = new int[14]{ 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[10] = new int[14]{ 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 4 };
+
+			labMatrix[11] = new int[14]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1 };
+
+			labMatrix[12] = new int[14]{ 1, 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 1 };
+
+			labMatrix[13] = new int[14]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+			break;
 
 		}
+
+		break;
+
+	case 2:
+
+		switch (level)
+		{
+		case 1:
+			//Catacumba: 2, nivel: 1
+			size.x = 17;
+			size.y = 17;
+			labMatrix = new int*[17];
+			labMatrix[0] = new int[17]{ 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+			labMatrix[1] = new int[17]{ 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1 };
+
+			labMatrix[2] = new int[17]{ 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1 };
+
+			labMatrix[3] = new int[17]{ 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1 };
+
+			labMatrix[4] = new int[17]{ 1, 1, 14, 1, 0, 0, 0, 0, 1, 0, 0, 11, 0, 0, 0, 1, 1 };
+
+			labMatrix[5] = new int[17]{ 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1 };
+
+			labMatrix[6] = new int[17]{ 1, 0, 0, 1, 1, 13, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1 };
+
+			labMatrix[7] = new int[17]{ 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1 };
+
+			labMatrix[8] = new int[17]{ 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1 };
+
+			labMatrix[9] = new int[17]{ 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1 };
+
+			labMatrix[10] = new int[17]{ 1, 1, 1, 1, 1, 0, 1, 0, 1, 12, 0, 0, 0, 0, 1, 0, 1 };
+
+			labMatrix[11] = new int[17]{ 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1 };
+
+			labMatrix[12] = new int[17]{ 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
+
+			labMatrix[13] = new int[17]{ 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1 };
+
+			labMatrix[14] = new int[17]{ 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1 };
+
+			labMatrix[15] = new int[17]{ 1, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
+
+			labMatrix[16] = new int[17]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1 };
+
+
+			break;
+		case 2:
+			//Catacumba: 2, nivel: 2
+			size.x = 17;
+			size.y = 17;
+			labMatrix = new int*[17];
+			labMatrix[0] = new int[17]{ 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+			labMatrix[1] = new int[17]{ 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 2, 1 };
+
+			labMatrix[2] = new int[17]{ 1, 1, 0, 1, 2, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1 };
+
+			labMatrix[3] = new int[17]{ 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1 };
+
+			labMatrix[4] = new int[17]{ 1, 1, 14, 1, 0, 0, 0, 0, 1, 0, 0, 11, 0, 0, 0, 1, 1 };
+
+			labMatrix[5] = new int[17]{ 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1 };
+
+			labMatrix[6] = new int[17]{ 1, 0, 0, 1, 1, 13, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1 };
+
+			labMatrix[7] = new int[17]{ 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1 };
+
+			labMatrix[8] = new int[17]{ 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1 };
+
+			labMatrix[9] = new int[17]{ 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1 };
+
+			labMatrix[10] = new int[17]{ 1, 1, 1, 1, 1, 0, 1, 0, 1, 12, 0, 0, 0, 0, 1, 0, 1 };
+
+			labMatrix[11] = new int[17]{ 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1 };
+
+			labMatrix[12] = new int[17]{ 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
+
+			labMatrix[13] = new int[17]{ 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1 };
+
+			labMatrix[14] = new int[17]{ 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1 };
+
+			labMatrix[15] = new int[17]{ 1, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 2, 1, 0, 0, 1 };
+
+			labMatrix[16] = new int[17]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1 };
+
+
+			break;
+		case 3:
+			//Catacumba: 2, nivel: 3
+			size.x = 20;
+			size.y = 20;
+			labMatrix = new int*[20];
+			labMatrix[0] = new int[20]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+			labMatrix[1] = new int[20]{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 1 };
+
+			labMatrix[2] = new int[20]{ 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1 };
+
+			labMatrix[3] = new int[20]{ 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1 };
+
+			labMatrix[4] = new int[20]{ 1, 1, 1, 0, 1, 2, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 };
+
+			labMatrix[5] = new int[20]{ 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1 };
+
+			labMatrix[6] = new int[20]{ 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 2, 1, 1 };
+
+			labMatrix[7] = new int[20]{ 4, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1 };
+
+			labMatrix[8] = new int[20]{ 1, 0, 0, 0, 11, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1 };
+
+			labMatrix[9] = new int[20]{ 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 13, 1, 1 };
+
+			labMatrix[10] = new int[20]{ 1, 0, 0, 0, 0, 0, 1, 1, 12, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1 };
+
+			labMatrix[11] = new int[20]{ 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1 };
+
+			labMatrix[12] = new int[20]{ 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1 };
+
+			labMatrix[13] = new int[20]{ 1, 1, 0, 1, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1 };
+
+			labMatrix[14] = new int[20]{ 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1 };
+
+			labMatrix[15] = new int[20]{ 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1 };
+
+			labMatrix[16] = new int[20]{ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 };
+
+			labMatrix[17] = new int[20]{ 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1 };
+
+			labMatrix[18] = new int[20]{ 1, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 };
+
+			labMatrix[19] = new int[20]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+
+			break;
+		case 4:
+			//Catacumba: 2, nivel: 4
+			size.x = 20;
+			size.y = 20;
+			labMatrix = new int*[20];
+			labMatrix[0] = new int[20]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+			labMatrix[1] = new int[20]{ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 1 };
+
+			labMatrix[2] = new int[20]{ 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1 };
+
+			labMatrix[3] = new int[20]{ 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1 };
+
+			labMatrix[4] = new int[20]{ 1, 1, 1, 0, 1, 2, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 };
+
+			labMatrix[5] = new int[20]{ 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1 };
+
+			labMatrix[6] = new int[20]{ 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 2, 1, 1 };
+
+			labMatrix[7] = new int[20]{ 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1 };
+
+			labMatrix[8] = new int[20]{ 1, 0, 0, 0, 11, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1 };
+
+			labMatrix[9] = new int[20]{ 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 13, 1, 1 };
+
+			labMatrix[10] = new int[20]{ 1, 0, 0, 0, 0, 0, 1, 1, 12, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1 };
+
+			labMatrix[11] = new int[20]{ 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1 };
+
+			labMatrix[12] = new int[20]{ 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1 };
+
+			labMatrix[13] = new int[20]{ 1, 1, 0, 1, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1 };
+
+			labMatrix[14] = new int[20]{ 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1 };
+
+			labMatrix[15] = new int[20]{ 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1 };
+
+			labMatrix[16] = new int[20]{ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 };
+
+			labMatrix[17] = new int[20]{ 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1 };
+
+			labMatrix[18] = new int[20]{ 4, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 };
+
+			labMatrix[19] = new int[20]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+
+			break;
+		}
+
 		break;
 	}
 

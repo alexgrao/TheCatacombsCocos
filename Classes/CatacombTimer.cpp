@@ -34,12 +34,14 @@ void CatacombTimer::Reset()
 	currentTime = 0;
 	running = false;
 	counter = 0;
+	percentage = 0;
 }
 
 void CatacombTimer::Restart()
 {
 	currentTime = 0;
 	running = true;
+	percentage = 0;
 }
 
 float CatacombTimer::GetTime() { return currentTime; }
@@ -51,3 +53,5 @@ void CatacombTimer::SetInterval(float Interval) { interval = Interval; }
 float CatacombTimer::GetPercentageFull() { return percentage; }
 
 int CatacombTimer::GetCount() { return counter; }
+
+bool CatacombTimer::IsRunning() { return running; }

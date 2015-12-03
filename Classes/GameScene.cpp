@@ -50,7 +50,7 @@ bool GameScene::init()
 	MyFunctions::SetSprite(floor, 0, 0, 100, 45);
 	addChild(floor, 0);
 
-	laberynth.Load(1, 1);
+	laberynth.Load(catacomb, level);
 
 	loadPlayer();
 
@@ -59,6 +59,7 @@ bool GameScene::init()
 	// KEY EVENT FOR MOVING
 	auto listener = EventListenerKeyboard::create();
 	listener->onKeyPressed = CC_CALLBACK_2(GameScene::onKeyPressed, this);
+	listener->onKeyReleased = CC_CALLBACK_2(GameScene::onKeyReleased, this);
 	this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 
 	findEnemies();
@@ -85,8 +86,8 @@ bool GameScene::init()
 	delta = Vector2F(0, 0);
 
 	lanternShadow = Sprite::create(Assets::LanternShadow);
-	//lanternShadow->setScale(1);
-	lanternShadow->setOpacity(240);
+	//lanternShadow->setOpacity(240);
+	lanternShadow->setOpacity(0);
 	addChild(lanternShadow, 15);
 
 	// MOUSE EVENT FOR CROSS
@@ -94,6 +95,13 @@ bool GameScene::init()
 	listenerMouse->onMouseMove = CC_CALLBACK_1(GameScene::OnMouseMove, this);
 	listenerMouse->onMouseDown = CC_CALLBACK_1(GameScene::OnMouseDown, this);
 	this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listenerMouse, this);
+
+	animatorTimer = CatacombTimer(0.75);
+
+	hands = new SpriteAnimator("animations/hands/hands", 28, 30);
+	hands->image->SetSize(103, 60);
+	hands->SetYVibe(0.01, 0, 5);
+	addChild(hands->image->sprite, 20);
 
 	return true;
 }
@@ -153,21 +161,11 @@ void GameScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
 {
 	switch (keyCode)
 	{
-	case EventKeyboard::KeyCode::KEY_W :
-		if (player.canForward)
-		{
-			player.stepForward();
-			updateView();
-			checkPlayerDirections();
-		}
+	case EventKeyboard::KeyCode::KEY_W:
+		WPressed = true;
 		break;
 	case EventKeyboard::KeyCode::KEY_S:
-		if (player.canBackward)
-		{
-			player.stepBackward();
-			updateView();
-			checkPlayerDirections();
-		}
+		SPressed = true;
 		break;
 	case EventKeyboard::KeyCode::KEY_A:
 		player.turnLeft();
@@ -179,9 +177,54 @@ void GameScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
 		updateView();
 		checkPlayerDirections();
 		break;
-	case EventKeyboard::KeyCode::KEY_ESCAPE:
-		PauseGame(this);
+	}
+
+	switch(keyCode)
+	{
+		case EventKeyboard::KeyCode::KEY_ESCAPE:
+			PauseGame(this);
+			break;
+	}
+}
+
+void GameScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event *event)
+{
+	switch (keyCode)
+	{
+	case EventKeyboard::KeyCode::KEY_W:
+		WPressed = false;
 		break;
+	case EventKeyboard::KeyCode::KEY_S:
+		SPressed = false;
+		break;
+	}
+}
+
+void GameScene::checkKeys()
+{
+	if (WPressed)
+	{
+		if (player.canForward)
+		{
+			player.stepForward();
+			//updateView();
+			moving = 1;
+			CalculateWallAnimations();
+			checkPlayerDirections();
+			CheckWin();
+		}
+	}
+	else if (SPressed)
+	{
+		if (player.canBackward)
+		{
+			player.stepBackward();
+			//updateView();
+			moving = -1;
+			CalculateWallAnimations();
+			checkPlayerDirections();
+			CheckWin();
+		}
 	}
 }
 
@@ -189,14 +232,14 @@ void GameScene::checkPlayerDirections()
 {
 	int x = player.Position.x + player.Direction.x;
 	int y = player.Position.y + player.Direction.y;
-	if (laberynth.isIn(x, y) && !laberynth.isWall(x, y) && !laberynth.isExitEntrance(x,y))
+	if (laberynth.isIn(x, y) && !laberynth.isWall(x, y) && !laberynth.isEntrance(x,y) /* && !laberynth.isExitEntrance(x,y)*/)
 		player.canForward = true;
 	else
 		player.canForward = false;
 
 	x = player.Position.x - player.Direction.x;
 	y = player.Position.y - player.Direction.y;
-	if (laberynth.isIn(x, y) && !laberynth.isWall(x, y) && !laberynth.isExitEntrance(x, y))
+	if (laberynth.isIn(x, y) && !laberynth.isWall(x, y) && !laberynth.isEntrance(x, y)/*&& !laberynth.isExitEntrance(x, y)*/)
 		player.canBackward = true;
 	else
 		player.canBackward = false;
@@ -206,291 +249,110 @@ void GameScene::findView()
 {
 	walls.clear();
 
-	int x, y;
 	bool avoidLeft = false, avoidRight = false;
 
-	//// NIVEL 1
-	x = player.Position.x + player.Direction.x;
-	y = player.Position.y + player.Direction.y;
+	int x = player.Position.x;
+	int y = player.Position.y;
 
-	if (laberynth.isWall(x, y))
+	float posX, posY, width, height;
+
+	for (int nivel = 0; nivel < 4; ++nivel)
 	{
-		walls.push_back(new CentSprite(Assets::Wall, 0, 0, 100, 100));
-		return;
-	}
-	/*else if (laberynth.isExitEntrance(x, y))
-	{
-		int n = laberynth.Get(x, y);
-		if (n == 3)
-			walls.push_back(new CentSprite(Assets::Upstairs, 0, 0, 100, 100));
+		x += player.Direction.x;
+		y += player.Direction.y;
+
+		if (!laberynth.isIn(x, y)) return;
+
+
+		CentSprite* shadow = new CentSprite(Assets::Shadow, 0, Assets::ShadowsParams[nivel][0], 100, Assets::ShadowsParams[nivel][1], 6 - nivel);
+		walls.push_back(shadow);
+		shadow->SetOpacity(Assets::ShadowsParams[nivel][2]);
+		walls[walls.size() - 1]->Tag = "ShadowFront";
+
+		////////////////////////////////////////////////////////////////// LATERALES FRONTALES
+		if (nivel > 0) // Solo para los niveles 2-4
+		{
+			if (!avoidLeft)
+			{
+				// Pared frontal izquierda
+				if (laberynth.isWall(x + player.Left.x, y + player.Left.y))
+				{
+					posX = Assets::LeftWallParams[nivel][0];
+					posY = Assets::LeftWallParams[nivel][1];
+					width = Assets::LeftWallParams[nivel][2];
+					height = Assets::LeftWallParams[nivel][3];
+					walls.push_back(new CentSprite(Assets::Wall, posX, posY, width, height, 6-nivel));
+					walls[walls.size() - 1]->Tag = "LeftFrontal";
+				}
+			}
+
+			if (!avoidRight)
+			{
+				// Pared frontal derecha
+				if (laberynth.isWall(x - player.Left.x, y - player.Left.y))
+				{
+					posX = Assets::RightWallParams[nivel][0];
+					posY = Assets::RightWallParams[nivel][1];
+					width = Assets::RightWallParams[nivel][2];
+					height = Assets::RightWallParams[nivel][3];
+					walls.push_back(new CentSprite(Assets::Wall, posX, posY, width, height, 6-nivel));
+					walls[walls.size() - 1]->Tag = "RightFrontal";
+				}
+			}
+
+			avoidLeft = avoidRight = false;
+		}
+
+		///////////////////////////////////// FRONTAL
+
+		if (laberynth.isWall(x, y))
+		{
+			posX = Assets::FrontWallsParams[nivel][0];
+			posY = Assets::FrontWallsParams[nivel][1];
+			width = Assets::FrontWallsParams[nivel][2];
+			height = Assets::FrontWallsParams[nivel][3];
+			walls.push_back(new CentSprite(Assets::Wall, posX, posY, width, height, 6 - nivel));
+			walls[walls.size() - 1]->Tag = "Frontal";
+		}
+
+		///////////////////////////////////// LATERALES EN PERSPECTIVA
 		else
-			walls.push_back(new CentSprite(Assets::Downstairs, 0, 0, 100, 100));
-		return;
-	}*/
-	else
-	{
-		// IZQUIERDA
-		if (laberynth.isWall(x + player.Left.x, y + player.Left.y))
 		{
-			avoidLeft = true;
-			walls.push_back(new CentSprite(Assets::ShadowOverWall, 27.7, 0, -20, 98, 6));
-			walls[walls.size() - 1]->SetOpacity(90);
-			walls.push_back(new CentSprite(Assets::Wall3D, 27.7, 0, -20, 98, 6));
+			// IZQUIERDA
+			if (laberynth.isWall(x + player.Left.x, y + player.Left.y))
+			{
+				avoidLeft = true;
+
+				posX = Assets::Left3DWallParams[nivel][0];
+				posY = Assets::Left3DWallParams[nivel][1];
+				width = Assets::Left3DWallParams[nivel][2];
+				height = Assets::Left3DWallParams[nivel][3];
+
+				walls.push_back(new CentSprite(Assets::ShadowOverWall, posX, posY, width, height, 6 - nivel));
+				walls[walls.size() - 1]->Tag = "Left3DShadow";
+				walls[walls.size() - 1]->SetOpacity(150);
+				walls.push_back(new CentSprite(Assets::Wall3D, posX, posY, width, height, 6-nivel));
+				walls[walls.size() - 1]->Tag = "Left3D";
+			}
+			//DERECHA
+			if (laberynth.isWall(x - player.Left.x, y - player.Left.y))
+			{
+				avoidRight = true;
+
+				posX = Assets::Right3DWallParams[nivel][0];
+				posY = Assets::Right3DWallParams[nivel][1];
+				width = Assets::Right3DWallParams[nivel][2];
+				height = Assets::Right3DWallParams[nivel][3];
+
+				walls.push_back(new CentSprite(Assets::ShadowOverWall, posX, posY, width, height, 6-nivel));
+				walls[walls.size() - 1]->Tag = "Right3DShadow";
+				walls[walls.size() - 1]->SetOpacity(150);
+				walls.push_back(new CentSprite(Assets::Wall3D, posX, posY, width, height, 6-nivel));
+				walls[walls.size() - 1]->Tag = "Right3D";
+			}
 		}
-		// DERECHA
-		if (laberynth.isWall(x - player.Left.x, y - player.Left.y))
-		{
-			avoidRight = true;
-			walls.push_back(new CentSprite(Assets::ShadowOverWall, 84.8, 0, 20, 98, 6));
-			walls[walls.size() - 1]->SetOpacity(90);
-			walls.push_back(new CentSprite(Assets::Wall3D, 84.8, 0, 20, 98, 6));
-		}
+
 	}
-
-	/////////// SHADOW 0
-
-	CentSprite* s0 = new CentSprite(Assets::Shadow, 0, 10, 100, 80, 6);
-	walls.push_back(s0);
-	s0->SetOpacity(90);
-
-	//// NIVEL 2
-	
-	x += player.Direction.x;
-	y += player.Direction.y;
-
-	if (!laberynth.isIn(x, y)) return;
-
-	if (!avoidLeft)
-	{
-		if (laberynth.isWall(x + player.Left.x, y + player.Left.y))
-		{
-			walls.push_back(new CentSprite(Assets::Wall, 5, 21.4, 19.7, 52, 6));
-		}
-		/*else if (laberynth.isExitEntrance(x + player.Left.x, y + player.Left.y))
-		{
-			int n = laberynth.Get(x, y);
-			if (n == 3)
-				walls.push_back(new CentSprite(Assets::Upstairs, 5, 21.4, 19.7, 52));
-			else
-				walls.push_back(new CentSprite(Assets::Downstairs, 5, 21.4, 19.7, 52));
-		}*/
-	}
-
-	if (!avoidRight)
-	{
-		if (laberynth.isWall(x - player.Left.x, y - player.Left.y))
-		{
-			walls.push_back(new CentSprite(Assets::Wall, 84.8, 21.7, 20, 51, 6));
-		}
-		/*else if (laberynth.isExitEntrance(x - player.Left.x, y - player.Left.y))
-		{
-			int n = laberynth.Get(x, y);
-			if (n == 3)
-				walls.push_back(new CentSprite(Assets::Upstairs, 84.8, 21.7, 20, 51));
-			else
-				walls.push_back(new CentSprite(Assets::Downstairs, 84.8, 21.7, 20, 51));
-		}*/
-	}
-
-	avoidLeft = avoidRight = false;
-
-	if (laberynth.isWall(x, y))
-	{
-		walls.push_back(new CentSprite(Assets::Wall, 20, 21.7, 63, 51.3, 6));
-	}
-	/*else if (laberynth.isExitEntrance(x,y))
-	{
-		int n = laberynth.Get(x, y);
-		if (n == 3)
-			walls.push_back(new CentSprite(Assets::Upstairs, 20, 21.7, 63, 51.3));
-		else
-			walls.push_back(new CentSprite(Assets::Downstairs, 20, 21.7, 63, 51.3));
-	}*/
-	else
-	{
-
-		// IZQUIERDA
-		if (laberynth.isWall(x + player.Left.x, y + player.Left.y))
-		{
-			avoidLeft = true;
-			walls.push_back(new CentSprite(Assets::ShadowOverWall, 36.5, 21.4, -10, 52, 5));
-			walls[walls.size() - 1]->SetOpacity(150);
-			walls.push_back(new CentSprite(Assets::Wall3D, 36.5, 21.4, -10, 52, 5));
-		}
-		//DERECHA
-		if (laberynth.isWall(x - player.Left.x, y - player.Left.y))
-		{
-			avoidRight = true;
-			walls.push_back(new CentSprite(Assets::ShadowOverWall, 75.5, 21.7, 10, 51, 5));
-			walls[walls.size() - 1]->SetOpacity(150);
-			walls.push_back(new CentSprite(Assets::Wall3D, 75.5, 21.7, 10, 51, 5));
-		}
-	}
-
-	/////////// SHADOW 1
-
-	CentSprite* s1 = new CentSprite(Assets::Shadow, 0, 20, 100, 60, 5);
-	walls.push_back(s1);
-	s1->SetOpacity(150);
-
-	//// NIVEL 3
-
-	x += player.Direction.x;
-	y += player.Direction.y;
-
-	if (!laberynth.isIn(x, y)) return;
-
-	//IZQUIERDA
-	if (!avoidLeft)
-	{
-		if (laberynth.isWall(x + player.Left.x, y + player.Left.y))
-		{
-			walls.push_back(new CentSprite(Assets::Wall, 3, 33, 30.9, 26.8, 5));
-		}
-		/*else if (laberynth.isExitEntrance(x + player.Left.x, y + player.Left.y))
-		{
-			int n = laberynth.Get(x, y);
-			if (n == 3)
-				walls.push_back(new CentSprite(Assets::Upstairs, 3, 33, 30.9, 26.8));
-			else
-				walls.push_back(new CentSprite(Assets::Downstairs, 3, 33, 30.9, 26.8));
-		}*/
-	}
-
-	//DERECHA
-	if (!avoidRight) 
-	{
-		if (laberynth.isWall(x - player.Left.x, y - player.Left.y))
-		{
-			walls.push_back(new CentSprite(Assets::Wall, 74.3, 33, 31.2, 26.5, 5));
-		}
-		/*else if (laberynth.isExitEntrance(x - player.Left.x, y - player.Left.y))
-		{
-			int n = laberynth.Get(x, y);
-			if (n == 3)
-				walls.push_back(new CentSprite(Assets::Upstairs, 74.3, 33, 31.2, 26.5));
-			else
-				walls.push_back(new CentSprite(Assets::Downstairs, 74.3, 33, 31.2, 26.5));
-		}*/
-	}
-
-	avoidLeft = avoidRight = false;
-
-	if (laberynth.isWall(x, y))
-	{
-		walls.push_back(new CentSprite(Assets::Wall, 30.8, 33, 43, 26.9, 5));
-	}
-	/*else if (laberynth.isExitEntrance(x, y))
-	{
-		int n = laberynth.Get(x, y);
-		if (n == 3)
-			walls.push_back(new CentSprite(Assets::Upstairs, 30.8, 33, 43, 26.9));
-		else
-			walls.push_back(new CentSprite(Assets::Downstairs, 30.8, 33, 43, 26.9));
-	}*/
-	else
-	{
-		// IZQUIERDA
-		if (laberynth.isWall(x + player.Left.x, y + player.Left.y))
-		{
-			avoidLeft = true;
-			// wall shadow
-			walls.push_back(new CentSprite(Assets::ShadowOverWall, 41.1, 32.9, -5, 27, 4));
-			walls[walls.size() - 1]->SetOpacity(150);
-			walls.push_back(new CentSprite(Assets::Wall3D, 41.1, 32.9, -5, 27, 4));
-		}
-		// DERECHA
-		if (laberynth.isWall(x - player.Left.x, y - player.Left.y))
-		{
-			avoidRight = true;
-			// wall shadow
-			walls.push_back(new CentSprite(Assets::ShadowOverWall, 71, 33, 5, 26.5, 4));
-			walls[walls.size() - 1]->SetOpacity(150);
-			walls.push_back(new CentSprite(Assets::Wall3D, 71, 33, 5, 26.5, 4));
-		}
-	}
-
-	/////////// SHADOW 2
-
-	CentSprite* s2 = new CentSprite(Assets::Shadow, 0, 32.5, 100, 30, 4);
-	walls.push_back(s2);
-	s2->SetOpacity(150);
-
-	//// NIVEL 4
-
-	x += player.Direction.x;
-	y += player.Direction.y;
-
-	if (!laberynth.isIn(x, y)) return;
-
-	if (!avoidLeft)
-	{
-		if (laberynth.isWall(x + player.Left.x, y + player.Left.y))
-		{
-			walls.push_back(new CentSprite(Assets::Wall, 3, 38.5, 35.3, 14.4, 4));
-		}
-		/*else if (laberynth.isExitEntrance(x + player.Left.x, y + player.Left.y))
-		{
-			int n = laberynth.Get(x, y);
-			if (n == 3)
-				walls.push_back(new CentSprite(Assets::Upstairs, 3, 38.5, 35.3, 14.4));
-			else
-				walls.push_back(new CentSprite(Assets::Downstairs, 3, 38.5, 35.3, 14.4));
-		}*/
-	}
-
-	if (!avoidRight)
-	{
-		if (laberynth.isWall(x - player.Left.x, y - player.Left.y))
-		{
-			walls.push_back(new CentSprite(Assets::Wall, 69.2, 38.5, 36, 14.4, 4));
-		}
-		/*else
-		{
-			int n = laberynth.Get(x, y);
-			if (n == 3)
-				walls.push_back(new CentSprite(Assets::Upstairs, 69.2, 38.5, 36, 14.4));
-			else
-				walls.push_back(new CentSprite(Assets::Downstairs, 69.2, 38.5, 36, 14.4));
-		}*/
-	}
-
-	avoidLeft = avoidRight = false;
-
-	if (laberynth.isWall(x, y))
-	{
-		walls.push_back(new CentSprite(Assets::Wall, 36, 38.5, 34, 14.4, 4));
-	}
-	/*else if (laberynth.isExitEntrance(x, y))
-	{
-		int n = laberynth.Get(x, y);
-		if (n == 3)
-			walls.push_back(new CentSprite(Assets::Upstairs, 36, 38.5, 34, 14.4));
-		else
-			walls.push_back(new CentSprite(Assets::Downstairs, 36, 38.5, 34, 14.4));
-	}*/
-	else
-	{
-
-		//IZQUIERDA
-		if (laberynth.isWall(x + player.Left.x, y + player.Left.y))
-		{
-			avoidLeft = true;
-			walls.push_back(new CentSprite(Assets::Wall3D, 43.2, 38.5, -2.5, 14.7, 3));
-		}
-		// DERECHA
-		if (laberynth.isWall(x - player.Left.x, y - player.Left.y))
-		{
-			avoidRight = true;
-			walls.push_back(new CentSprite(Assets::Wall3D, 68.8, 38.5, 2.5, 14.7, 3));
-		}
-	}
-
-	/////////// SHADOW 3
-
-	CentSprite* s3 = new CentSprite(Assets::Shadow, 0, 38.5, 100, 15, 3);
-	walls.push_back(s3);
-	s3->SetOpacity(255);
 }
 
 void GameScene::findEnemyView(int i)
@@ -518,19 +380,19 @@ void GameScene::findEnemyView(int i)
 	// Si no está lateralmente visible
 	if (distanceLateral < -1 || distanceLateral > 1)
 	{
-		e->NotVisible();
+		e->SetVisible(false);
 		return;
 	}
 
 	// si el jugador mira en dirección contraria
 	if (distanceFrontal > 0 && sense > 0)
 	{
-		e->NotVisible();
+		e->SetVisible(false);
 		return;
 	}
 	if (distanceFrontal < 0 && sense < 0)
 	{
-		e->NotVisible();
+		e->SetVisible(false);
 		return;
 	}
 
@@ -539,14 +401,16 @@ void GameScene::findEnemyView(int i)
 	// si está demasiado lejos
 	if (distanceFrontal > 4)
 	{
-		e->NotVisible();
+		e->SetVisible(false);
 		return;
 	}
 	if (distanceFrontal < 0)
 	{
-		e->NotVisible();
+		e->SetVisible(false);
 		return;
 	}
+
+	e->SetVisible(true);
 
 	if (e->DistanceToCamera().x > distanceFrontal)
 		e->sprite->SetOrderZ(7 - distanceFrontal);
@@ -559,6 +423,8 @@ void GameScene::findEnemyView(int i)
 
 void GameScene::updateView()
 {
+	wallAnimators.clear();
+
 	for (int i = 0; i < walls.size(); ++i)
 	{
 		removeChild(walls[i]->sprite);
@@ -580,6 +446,16 @@ void GameScene::update(float delta)
 {
 	time += delta;
 
+	hands->AnimateVibes(delta);
+
+	if (moving != 0)
+	{
+		AnimateWalls(delta);
+		hands->AnimateSprites(delta);
+	}
+	else
+		checkKeys();
+
 	for (int i = 0; i < enemies.size(); ++i)
 	{
 		Enemy* e = enemies[i];
@@ -592,14 +468,9 @@ void GameScene::update(float delta)
 				e->stepForward();
 				laberynth.MoveEnemy(prev.x, prev.y, e->Position.x, e->Position.y);
 				findEnemyView(i);
-				e->UpdateSprite();
-			}
-			else
-			{
-				e->UpdateSprite();
 			}
 
-			debugg->setString(std::to_string(e->DistanceToCamera().x));
+			if (e->IsVisible()) e->UpdateSprite();
 		}
 	}
 
@@ -647,17 +518,13 @@ void GameScene::OnMouseDown(Event *event)
 
 void GameScene::checkPressedOnEnemies(int x, int y)
 {
-	auto director = Director::getInstance();
-	Size screenSize = director->getVisibleSize();
-	float percentageX = x * 100 / screenSize.width; // x = z%Screen.width  z = x*100 / Screen.width
-	float percentageY = y * 100 / screenSize.height;
 
 	for (int i = 0; i < enemies.size(); ++i)
 	{
 		Enemy* e = enemies[i];
 		if (e->sprite->GetPosition().x < 0) continue;
 
-		if (MyFunctions::IsIn(percentageX, percentageY, e->sprite))
+		if (MyFunctions::IsIn(x, y, e->sprite))
 		{
 			if (e->Damage())
 			{
@@ -686,7 +553,9 @@ void GameScene::DeleteEverything()
 	}
 	enemies.clear();
 
-
+	removeChild(hands->image->sprite);
+	hands->DeleteEverything();
+	delete(hands);
 
 }
 
@@ -701,4 +570,120 @@ void GameScene::BackToMenu(Ref *pSender)
 {
 	Director::getInstance()->getOpenGLView()->setCursorVisible(true);
 	Director::getInstance()->popScene();
+}
+
+void GameScene::CheckWin()
+{
+	if (!laberynth.isExit(player.Position.x, player.Position.y)) return;
+
+	BackToMenu(this);
+}
+
+void GameScene::AnimateWalls(float delta)
+{
+	// Si ya ha terminado
+	if (animatorTimer.Check(delta))
+	{
+		animatorTimer.Restart();
+		updateView();
+		moving = 0;
+		return;
+	}
+
+	for (int i = 0; i < wallAnimators.size(); ++i)
+	{
+		WallAnimator anim = wallAnimators[i];
+
+		anim.Animate(animatorTimer.GetPercentageFull());
+	}
+}
+
+void GameScene::CalculateWallAnimations()
+{
+	for (int i = 0; i < walls.size(); ++i)
+	{
+		CentSprite* cs = walls[i];
+
+		/*if (cs->Tag == "Left3DShadow" || cs->Tag == "Right3DShadow" || cs->Tag == "ShadowFront")
+			continue;*/
+
+		int nextDistance = (6 - cs->sprite->getZOrder()) - moving;
+
+		WallAnimator anim = WallAnimator(cs);
+		anim.SetOrigin(cs->GetPosition().x, cs->GetPosition().y, cs->GetSize().x, cs->GetSize().y);
+
+		if (cs->Tag == "Frontal")
+		{
+			if (nextDistance < 0)
+				anim.SetDestiny(0,0,100,100);
+			else if (nextDistance > 3)
+				anim.SetDestiny(39, 40, 29, 9);
+			else
+				anim.SetDestiny(Assets::FrontWallsParams[nextDistance]);
+		}
+		else if (cs->Tag == "LeftFrontal")
+		{
+			if (nextDistance < 1)
+				anim.SetDestiny(-100, 0, 100, 100);
+			else if (nextDistance > 3)
+				anim.SetDestiny(3, 40, 29, 9);
+			else
+				anim.SetDestiny(Assets::LeftWallParams[nextDistance]);
+		}
+		else if (cs->Tag == "RightFrontal")
+		{
+			if (nextDistance < 1)
+				anim.SetDestiny(100, 0, 100, 100);
+			else if (nextDistance > 3)
+				anim.SetDestiny(45, 40, 29, 9);
+			else
+				anim.SetDestiny(Assets::RightWallParams[nextDistance]);
+		}
+		else if (cs->Tag == "Left3D" )
+		{
+			if (nextDistance < 0)
+				anim.SetDestiny(10, -43.5, -40, 195);
+			else if (nextDistance > 3)
+				anim.SetDestiny(44, 40, -1.25, 10);
+			else
+				anim.SetDestiny(Assets::Left3DWallParams[nextDistance]);
+		}
+		else if (cs->Tag == "Right3D")
+		{
+			if (nextDistance < 0)
+				anim.SetDestiny(103, -43.5, 40, 195);
+			else if (nextDistance > 3)
+				anim.SetDestiny(44, 40, 1.25, 10);
+			else
+				anim.SetDestiny(Assets::Right3DWallParams[nextDistance]);
+		}
+		else if (cs->Tag == "ShadowFront")
+		{
+			int newOpacity = 0;
+			if (nextDistance > 3) newOpacity = 255;
+			else if (nextDistance > 0) newOpacity = Assets::ShadowsParams[nextDistance][2];
+			anim.SetDestiny(0, Assets::ShadowsParams[nextDistance][0], 100, Assets::ShadowsParams[nextDistance][1], newOpacity);
+		}
+		else if (cs->Tag == "Left3DShadow")
+		{
+			if (nextDistance < 0)
+				anim.SetDestiny(10, -43.5, -40, 195, 0);
+			else if (nextDistance > 3)
+				anim.SetDestiny(44, 40, -1.25, 10, 255);
+			else
+				anim.SetDestiny(Assets::Left3DWallParams[nextDistance], Assets::ShadowsParams[nextDistance][2]);
+
+		}
+		else if (cs->Tag == "Right3DShadow")
+		{
+			if (nextDistance < 0)
+				anim.SetDestiny(103, -43.5, 40, 195, 0);
+			else if (nextDistance > 3)
+				anim.SetDestiny(44, 40, 1.25, 10, 255);
+			else
+				anim.SetDestiny(Assets::Right3DWallParams[nextDistance], Assets::ShadowsParams[nextDistance][2]);
+		}
+
+		wallAnimators.push_back(anim);
+	}
 }

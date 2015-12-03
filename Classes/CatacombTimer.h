@@ -25,6 +25,7 @@ public:
 	int GetCount();
 
 	bool Check(float);
+	bool IsRunning();
 };
 
 #endif

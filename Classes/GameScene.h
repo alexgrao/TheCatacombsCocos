@@ -8,6 +8,8 @@
 #include "Enemy.h"
 #include "Vector2F.h"
 #include <vector>
+#include "WallAnimator.h"
+#include "SpriteAnimator.h"
 
 USING_NS_CC;
 
@@ -25,6 +27,19 @@ private:
 	void checkPlayerDirections();
 	void loadPlayer();
 
+	bool WPressed = false;
+	bool SPressed = false;
+	void checkKeys();
+
+	void CheckWin();
+
+	// Walls animation
+	int moving = 0; // 0 - Not moving  1 - Forward  -1 - Backward
+	void AnimateWalls(float);
+	CatacombTimer animatorTimer;
+	std::vector<WallAnimator> wallAnimators;
+	void CalculateWallAnimations();
+
 	// for weapon
 	Sprite* cross;
 	Vector2F recoil;
@@ -39,6 +54,8 @@ private:
 	void updateView();
 	void DeleteEverything();
 
+	SpriteAnimator* hands;
+
 	// Enemies
 	void findEnemies();
 	std::vector<Enemy*> enemies;
@@ -50,6 +67,7 @@ private:
 
 public:
 	void onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event);
+	void onKeyReleased(EventKeyboard::KeyCode keyCode, Event *event);
 	void OnMouseMove(Event *event);
 	void OnMouseDown(Event *event);
 	void PauseGame(Ref *pSender);

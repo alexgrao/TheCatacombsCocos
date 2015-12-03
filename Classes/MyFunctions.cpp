@@ -14,25 +14,32 @@ void MyFunctions::SetSprite(cocos2d::Sprite* sprite, float x, float y, float wid
 
 		float positionX = screenSize.width * x / 100;
 		float positionY = screenSize.height * y / 100;
+
 		float sizeX = screenSize.width * width / 100;
 		float sizeY = screenSize.height * height / 100;
+
+		sprite->setPosition(positionX + sizeX*0.063, positionY);
 
 		float scaleX = sizeX / sprite->getContentSize().width;
 		float scaleY = sizeY / sprite->getContentSize().height;
 		sprite->setScaleX(scaleX);
 		sprite->setScaleY(scaleY);
 
-		sprite->setPosition(positionX + sizeX*0.063, positionY);
 		//sprite->setPosition(Point(positionX + sizeX / 1.78, screenSize.height - positionY - sizeY / 2));
 	}
 }
 
 bool MyFunctions::IsIn(int x, int y, CentSprite* cs)
 {
-	if (x < cs->GetPosition().x) return false;
-	if (x > cs->GetPosition().x + cs->GetSize().x) return false;
-	if (y < cs->GetPosition().y) return false;
-	if (y > cs->GetPosition().y + cs->GetSize().y) return false;
+	auto director = Director::getInstance();
+	Size screenSize = director->getVisibleSize();
+	float percentageX = (float)x * 100 / screenSize.width; // x = z%Screen.width  z = x*100 / Screen.width
+	float percentageY = (float)y * 100 / screenSize.height;
+
+	if (percentageX < cs->GetPosition().x) return false;
+	if (percentageX > cs->GetPosition().x + cs->GetSize().x) return false;
+	if (percentageY < cs->GetPosition().y + 2) return false;
+	if (percentageY > cs->GetPosition().y + cs->GetSize().y + 2) return false;
 
 	return true;
 }
