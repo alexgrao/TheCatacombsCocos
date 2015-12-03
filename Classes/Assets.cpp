@@ -29,7 +29,11 @@ const char* Assets::RedBall = "images/GameMenu/red_ball.png";
 
 float Assets::FrontWallsParams[4][4] = 
 {
+<<<<<<< HEAD
 	{ 0, 0, 100, 100},        // Para profundidad 1
+=======
+	{ 0, 0, 100, 100},    // Para profundidad 1
+>>>>>>> origin/master
 	{ 20, 21.7, 63, 51.3},    // Para profundidad 2
 	{ 30.8, 33, 43, 26.9},    // Para profundidad 3
 	{ 36, 38.5, 34, 14.4}     // Para profundidad 4
@@ -37,8 +41,13 @@ float Assets::FrontWallsParams[4][4] =
 
 float Assets::LeftWallParams[4][4] =
 {
+<<<<<<< HEAD
 	{ -100,0,100,100},
 	{ -41, 21.4, 63, 52 },
+=======
+	{ 0,0,0,0},
+	{ 5, 21.4, 19.7, 52 },
+>>>>>>> origin/master
 	{ 3, 33, 30.9, 26.8 },
 	{ 3, 38.5, 35.3, 14.4 }
 };
@@ -53,8 +62,13 @@ float Assets::Left3DWallParams[4][4] =
 
 float Assets::RightWallParams[4][4] =
 {
+<<<<<<< HEAD
 	{ 100,0,100,100 },
 	{ 82, 21.7, 63, 51.1 },
+=======
+	{ 0,0,0,0 },
+	{ 84.8, 21.7, 20, 51 },
+>>>>>>> origin/master
 	{ 74.3, 33, 31.2, 26.5 },
 	{ 69.2, 38.5, 36, 14.4 }
 };

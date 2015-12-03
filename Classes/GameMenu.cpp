@@ -5,6 +5,7 @@
 #include "MyFunctions.h"
 #include "Assets.h"
 #include "CentSprite.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
 using namespace std;
@@ -103,6 +104,7 @@ void GameMenu::OnMouseMove(Event *event)
 	int x = e->getCursorX();
 	int y = e->getCursorY();
 
+<<<<<<< HEAD
 	if (overCity != 1 && MyFunctions::IsIn(x, y, Madrid))
 	{
 		if (selectedCity != 1)
@@ -163,10 +165,75 @@ void GameMenu::OnMouseMove(Event *event)
 			overCity = 0;
 	}
 
+=======
+	float newSize = 5;
+	float diff = newSize - 2;
+
+	// Si estamos sobre el boton de Madrid y antes no estabamos
+	if (overCity != 1 && MyFunctions::IsIn(x, y, Madrid))
+	{
+		// Aumenta el tamaño y márcalo
+		Vector2F before = Madrid->GetPosition();
+
+		Madrid->SetSize(newSize, newSize);
+		Madrid->SetPosition(Madrid->GetPosition().x - diff / 2, Madrid->GetPosition().y - diff / 2);
+		overCity = 1;
+
+		debugg->setString(std::to_string(before.x) + ", " + std::to_string(before.y) + " / " + std::to_string(Madrid->GetPosition().x) + ", " + std::to_string(Madrid->GetPosition().y));
+	}
+	// Si estabamos pero ahora ya no estamos sobre el boton
+	else if (overCity == 1 && !MyFunctions::IsIn(x, y, Madrid))
+	{
+		// Devuelvelo a su tamaño original y desmárcalo
+		Madrid->SetPosition(Madrid->GetPosition().x + diff / 2, Madrid->GetPosition().y + diff / 2);
+		Madrid->SetSize(2, 2);
+		overCity = 0;
+	}
+	// Lo mismo con Londres
+	else if (overCity != 2 && MyFunctions::IsIn(x, y, London))
+	{
+		London->SetSize(newSize, newSize);
+		London->SetPosition(London->GetPosition().x - newSize / 4, London->GetPosition().y - newSize / 4);
+		overCity = 2;
+	}
+	else if (overCity == 2 && !MyFunctions::IsIn(x, y, London))
+	{
+		London->SetPosition(London->GetPosition().x + newSize / 2, London->GetPosition().y + newSize / 2);
+		London->SetSize(2, 2);
+		overCity = 0;
+	}
+	// Lo mismo con Roma
+	else if (overCity != 3 && MyFunctions::IsIn(x, y, Rome))
+	{
+		Rome->SetSize(newSize, newSize);
+		Rome->SetPosition(Rome->GetPosition().x - newSize / 4, Rome->GetPosition().y - newSize / 4);
+		overCity = 3;
+	}
+	else if (overCity == 3 && !MyFunctions::IsIn(x, y, Rome))
+	{
+		Rome->SetPosition(Rome->GetPosition().x + newSize / 2, Rome->GetPosition().y + newSize / 2);
+		Rome->SetSize(2, 2);
+		overCity = 0;
+	}
+	// Lo mismo con Berlin
+	else if (overCity != 4 && MyFunctions::IsIn(x, y, Berlin))
+	{
+		Berlin->SetSize(newSize, newSize);
+		Berlin->SetPosition(Berlin->GetPosition().x - newSize / 4, Berlin->GetPosition().y - newSize / 4);
+		overCity = 4;
+	}
+	else if (overCity == 4 && !MyFunctions::IsIn(x, y, Berlin))
+	{
+		Berlin->SetPosition(Berlin->GetPosition().x + newSize / 2, Berlin->GetPosition().y + newSize / 2);
+		Berlin->SetSize(2, 2);
+		overCity = 0;
+	}
+>>>>>>> origin/master
 }
 
 void GameMenu::OnMouseDown(Event *event)
 {
+<<<<<<< HEAD
 	if (overCity == 0) return;
 	if (overCity == selectedCity) return;
 
@@ -204,4 +271,10 @@ void GameMenu::MarkCity(bool Big, int index)
 		cs->SetSize(2, 2);
 		overCity = 0;
 	}
+=======
+	EventMouse *e = (EventMouse*)event;
+
+	int x = e->getCursorX();
+	int y = e->getCursorY();
+>>>>>>> origin/master
 }

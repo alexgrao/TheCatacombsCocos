@@ -8,11 +8,22 @@
 class Player
 {
 private:
+<<<<<<< HEAD
 
 	// Objetos
 	float battery; // porcentaje
 	int bengalas[4]; // rojas - azules - verdes - amarillas
 	int bullets[4];    // tipo1 - tipo2 - tipo3 - tipo4
+=======
+	CatacombTimer timer;
+
+	// Objetos
+	float battery; // porcentaje
+	int bengalas[4] = { 0, 0, 0, 0 }; // rojas - azules - verdes - amarillas
+	int bullets[4] = { 0, 0, 0, 0 };;    // tipo1 - tipo2 - tipo3 - tipo4
+	float probabilidadBengalas;
+	float probabilidadBalas;
+>>>>>>> origin/master
 
 
 public:
@@ -32,6 +43,10 @@ public:
 	void stepBackward();
 
 	//Objetos
+<<<<<<< HEAD
+=======
+	void GenerarObjetos(Player *);
+>>>>>>> origin/master
 	float GetBattery();
 	void RefillBattery();
 	void AddBattery(float);

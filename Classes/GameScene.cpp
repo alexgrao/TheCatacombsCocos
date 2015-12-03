@@ -9,6 +9,8 @@
 #include "PauseScene.h"
 #include "GameMenu.h"
 #include "CatacombTimer.h"
+#include "Player.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
 using namespace std;
@@ -21,6 +23,7 @@ Scene* GameScene::createScene()
 
 	// 'layer' is an autorelease object
 	auto layer = GameScene::create();
+
 
 	// add layer as a child to scene
 	scene->addChild(layer);
@@ -56,6 +59,8 @@ bool GameScene::init()
 
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 
+	//auto audio = SimpleAudioEngine::getInstance();
+
 	// KEY EVENT FOR MOVING
 	auto listener = EventListenerKeyboard::create();
 	listener->onKeyPressed = CC_CALLBACK_2(GameScene::onKeyPressed, this);
@@ -63,12 +68,24 @@ bool GameScene::init()
 	this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 
 	findEnemies();
-
-	// DEBUGG LABEL
-	debugg = Label::createWithTTF("Tiempo: 0", "fonts/Marker Felt.ttf", 15);
-	debugg->setPosition(Point(visibleSize.width * 0.6, visibleSize.height*0.6));
+	// DEBUGG MOCHILA 
+	debugg = Label::createWithTTF(
+	"Bateria: " + std::to_string(player.GetBattery()) 
+	+ " Bengalas(R-B-G-Y): " + std::to_string(player.BengalasCount(0))  
+	+ std::to_string(player.BengalasCount(1))
+	+ std::to_string(player.BengalasCount(2))
+	+ std::to_string(player.BengalasCount(3))
+	+ " Balas(1-2-3-4): " + std::to_string(player.BulletsCount(0)) + std::to_string(player.BulletsCount(1)) + std::to_string(player.BulletsCount(2)) + std::to_string(player.BulletsCount(3))
+	, "fonts/Marker Felt.ttf", 15);
+	debugg->setPosition(Point(visibleSize.width * 0.5, visibleSize.height*0.1));
 	debugg->setColor(ccc3(255, 0, 0));
 	this->addChild(debugg, 20);
+
+	// DEBUGG LABEL
+	//debugg = Label::createWithTTF("Tiempo: 0", "fonts/Marker Felt.ttf", 15);
+	//debugg->setPosition(Point(visibleSize.width * 0.6, visibleSize.height*0.6));
+	//debugg->setColor(ccc3(255, 0, 0));
+	//this->addChild(debugg, 20);
 
 	// Update walls view
 	updateView();
@@ -161,21 +178,51 @@ void GameScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
 {
 	switch (keyCode)
 	{
+<<<<<<< HEAD
 	case EventKeyboard::KeyCode::KEY_W:
 		WPressed = true;
 		break;
 	case EventKeyboard::KeyCode::KEY_S:
 		SPressed = true;
+=======
+	case EventKeyboard::KeyCode::KEY_W :
+		if (player.canForward)
+		{
+			player.stepForward();
+			updateView();
+			checkPlayerDirections();
+			CheckWin();
+			CheckMochila();
+			CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(1.0);
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/ButtonClick.wav");
+		}
+		break;
+	case EventKeyboard::KeyCode::KEY_S:
+		if (player.canBackward)
+		{
+			player.stepBackward();
+			updateView();
+			checkPlayerDirections();
+			CheckWin();
+			CheckMochila();
+			CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(1.0);
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/ButtonClick.wav");
+		}
+>>>>>>> origin/master
 		break;
 	case EventKeyboard::KeyCode::KEY_A:
 		player.turnLeft();
 		updateView();
 		checkPlayerDirections();
+		CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(1.0);
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/ButtonClick.wav");
 		break;
 	case EventKeyboard::KeyCode::KEY_D:
 		player.turnRight();
 		updateView();
 		checkPlayerDirections();
+		CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(1.0);
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/ButtonClick.wav");
 		break;
 	}
 
@@ -255,6 +302,7 @@ void GameScene::findView()
 	int y = player.Position.y;
 
 	float posX, posY, width, height;
+<<<<<<< HEAD
 
 	for (int nivel = 0; nivel < 4; ++nivel)
 	{
@@ -268,6 +316,15 @@ void GameScene::findView()
 		walls.push_back(shadow);
 		shadow->SetOpacity(Assets::ShadowsParams[nivel][2]);
 		walls[walls.size() - 1]->Tag = "ShadowFront";
+=======
+
+	for (int nivel = 0; nivel < 4; ++nivel)
+	{
+		x += player.Direction.x;
+		y += player.Direction.y;
+
+		if (!laberynth.isIn(x, y)) return;
+>>>>>>> origin/master
 
 		////////////////////////////////////////////////////////////////// LATERALES FRONTALES
 		if (nivel > 0) // Solo para los niveles 2-4
@@ -282,6 +339,7 @@ void GameScene::findView()
 					width = Assets::LeftWallParams[nivel][2];
 					height = Assets::LeftWallParams[nivel][3];
 					walls.push_back(new CentSprite(Assets::Wall, posX, posY, width, height, 6-nivel));
+<<<<<<< HEAD
 					walls[walls.size() - 1]->Tag = "LeftFrontal";
 				}
 			}
@@ -351,6 +409,74 @@ void GameScene::findView()
 				walls[walls.size() - 1]->Tag = "Right3D";
 			}
 		}
+=======
+				}
+			}
+
+			if (!avoidRight)
+			{
+				// Pared frontal derecha
+				if (laberynth.isWall(x - player.Left.x, y - player.Left.y))
+				{
+					posX = Assets::RightWallParams[nivel][0];
+					posY = Assets::RightWallParams[nivel][1];
+					width = Assets::RightWallParams[nivel][2];
+					height = Assets::RightWallParams[nivel][3];
+					walls.push_back(new CentSprite(Assets::Wall, posX, posY, width, height, 6-nivel));
+				}
+			}
+
+			avoidLeft = avoidRight = false;
+		}
+
+		///////////////////////////////////// FRONTAL
+
+		if (laberynth.isWall(x, y))
+		{
+			posX = Assets::FrontWallsParams[nivel][0];
+			posY = Assets::FrontWallsParams[nivel][1];
+			width = Assets::FrontWallsParams[nivel][2];
+			height = Assets::FrontWallsParams[nivel][3];
+			walls.push_back(new CentSprite(Assets::Wall, posX, posY, width, height, 6 - nivel));
+		}
+
+		///////////////////////////////////// LATERALES EN PERSPECTIVA
+		else
+		{
+			// IZQUIERDA
+			if (laberynth.isWall(x + player.Left.x, y + player.Left.y))
+			{
+				avoidLeft = true;
+
+				posX = Assets::Left3DWallParams[nivel][0];
+				posY = Assets::Left3DWallParams[nivel][1];
+				width = Assets::Left3DWallParams[nivel][2];
+				height = Assets::Left3DWallParams[nivel][3];
+
+				walls.push_back(new CentSprite(Assets::ShadowOverWall, posX, posY, width, height, 5 - nivel));
+				walls[walls.size() - 1]->SetOpacity(150);
+				walls.push_back(new CentSprite(Assets::Wall3D, posX, posY, width, height, 5-nivel));
+			}
+			//DERECHA
+			if (laberynth.isWall(x - player.Left.x, y - player.Left.y))
+			{
+				avoidRight = true;
+
+				posX = Assets::Right3DWallParams[nivel][0];
+				posY = Assets::Right3DWallParams[nivel][1];
+				width = Assets::Right3DWallParams[nivel][2];
+				height = Assets::Right3DWallParams[nivel][3];
+
+				walls.push_back(new CentSprite(Assets::ShadowOverWall, posX, posY, width, height, 5-nivel));
+				walls[walls.size() - 1]->SetOpacity(150);
+				walls.push_back(new CentSprite(Assets::Wall3D, posX, posY, width, height, 5-nivel));
+			}
+		}
+
+		CentSprite* shadow = new CentSprite(Assets::Shadow, 0, Assets::ShadowsParams[nivel][0], 100, Assets::ShadowsParams[nivel][1], 6-nivel);
+		walls.push_back(shadow);
+		shadow->SetOpacity(Assets::ShadowsParams[nivel][2]);
+>>>>>>> origin/master
 
 	}
 }
@@ -471,8 +597,18 @@ void GameScene::update(float delta)
 			}
 
 			if (e->IsVisible()) e->UpdateSprite();
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 		}
 	}
+	debugg->setString("Bateria: " + std::to_string(player.GetBattery())
+		+ " Bengalas(R-B-G-Y): " + std::to_string(player.BengalasCount(0))
+		+ std::to_string(player.BengalasCount(1))
+		+ std::to_string(player.BengalasCount(2))
+		+ std::to_string(player.BengalasCount(3))
+		+ " Balas(1-2-3-4): " + std::to_string(player.BulletsCount(0)) + std::to_string(player.BulletsCount(1)) + std::to_string(player.BulletsCount(2)) + std::to_string(player.BulletsCount(3)));
 
 	// cross movement
 
@@ -579,6 +715,7 @@ void GameScene::CheckWin()
 	BackToMenu(this);
 }
 
+<<<<<<< HEAD
 void GameScene::AnimateWalls(float delta)
 {
 	// Si ya ha terminado
@@ -685,5 +822,12 @@ void GameScene::CalculateWallAnimations()
 		}
 
 		wallAnimators.push_back(anim);
+=======
+void GameScene::CheckMochila()
+{
+	if (laberynth.isMochila(player.Position.x, player.Position.y)) {
+		player.GenerarObjetos(p);
+		laberynth.setField(player.Position.x, player.Position.y,0);
+>>>>>>> origin/master
 	}
 }

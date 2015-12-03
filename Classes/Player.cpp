@@ -79,5 +79,20 @@ int Player::BulletsCount(int tipo) { return bullets[tipo]; }
 
 int Player::BengalasCount(int color) { return bengalas[color]; }
 
+<<<<<<< HEAD
 // Timer for animation
 
+=======
+void Player::GenerarObjetos(Player* p) {
+	//RefillBattery();
+	p->AddBattery(25);
+	srand(time(NULL));
+	for (int i = 0; i < 4; i++) {
+		probabilidadBengalas = rand() % 2 + 1; // numero entre 1 y 2;
+		probabilidadBalas = rand() % 2 + 1; // numero entre 1 y 2;
+		if (probabilidadBengalas == 1) p->AddBengalas(i, 1);
+		if (probabilidadBalas == 1) p->AddBullets(i, 1);
+	}
+
+}
+>>>>>>> origin/master

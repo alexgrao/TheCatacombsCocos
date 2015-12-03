@@ -21,6 +21,7 @@ public:
 
 
 	//Funciones
+	void setField(int, int, int);
 	int field(int, int);
 	bool isWall(int, int);
 	bool isWall(Vector2);
@@ -29,6 +30,7 @@ public:
 	bool isEntrance(int, int);
 	bool isIn(int, int);
 	bool isEnemy(int, int);
+	bool isMochila(int, int);
 	void Load(int, int);
 	int Get(int, int);
 	void Set(int, int, int);
@@ -36,6 +38,7 @@ public:
 	Vector2* GetExit();
 	Vector2* Size();
 	void MoveEnemy(int, int, int, int);
+
 };
 
 #endif

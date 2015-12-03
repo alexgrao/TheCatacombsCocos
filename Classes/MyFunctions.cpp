@@ -38,8 +38,13 @@ bool MyFunctions::IsIn(int x, int y, CentSprite* cs)
 
 	if (percentageX < cs->GetPosition().x) return false;
 	if (percentageX > cs->GetPosition().x + cs->GetSize().x) return false;
+<<<<<<< HEAD
 	if (percentageY < cs->GetPosition().y + 2) return false;
 	if (percentageY > cs->GetPosition().y + cs->GetSize().y + 2) return false;
+=======
+	if (percentageY < cs->GetPosition().y) return false;
+	if (percentageY > cs->GetPosition().y+ cs->GetSize().y) return false;
+>>>>>>> origin/master
 
 	return true;
 }

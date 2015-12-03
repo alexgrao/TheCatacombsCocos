@@ -8,8 +8,12 @@
 #include "Enemy.h"
 #include "Vector2F.h"
 #include <vector>
+<<<<<<< HEAD
 #include "WallAnimator.h"
 #include "SpriteAnimator.h"
+=======
+#include "Sound.h"
+>>>>>>> origin/master
 
 USING_NS_CC;
 
@@ -21,12 +25,15 @@ private:
 
 	Label* debugg;
 	Laberynth laberynth;
+	Player player;
+	Player* p = &player;
+	//Sound sound;
 
 	// PlayerControl
-	Player player;
 	void checkPlayerDirections();
 	void loadPlayer();
 
+<<<<<<< HEAD
 	bool WPressed = false;
 	bool SPressed = false;
 	void checkKeys();
@@ -39,6 +46,10 @@ private:
 	CatacombTimer animatorTimer;
 	std::vector<WallAnimator> wallAnimators;
 	void CalculateWallAnimations();
+=======
+	void CheckWin();
+	void CheckMochila();
+>>>>>>> origin/master
 
 	// for weapon
 	Sprite* cross;

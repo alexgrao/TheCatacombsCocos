@@ -19,7 +19,10 @@ private:
 	CentSprite* Berlin;
 	int overCity = 0;
 	int selectedCity = 0; // Madrid 1, London 2, Rome 3, Berlin 4   None 0
+<<<<<<< HEAD
 	void MarkCity(bool, int);
+=======
+>>>>>>> origin/master
 
 public:
 	void Play(Ref *pSender);

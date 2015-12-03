@@ -52,6 +52,12 @@ bool Laberynth::isEnemy(int x, int y)
 	return false;
 }
 
+bool Laberynth::isMochila(int x, int y)
+{
+	if (labMatrix[x][y] == 2) return true;
+		return false;
+}
+
 int Laberynth::Get(int x, int y)
 {
 	return labMatrix[x][y];
@@ -105,6 +111,7 @@ void Laberynth::Load(int catacomb, int level)
 			labMatrix[1] = new int[12]{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1 };
 
 			labMatrix[2] = new int[12]{ 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1 };
+<<<<<<< HEAD
 
 			labMatrix[3] = new int[12]{ 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1 };
 
@@ -120,6 +127,23 @@ void Laberynth::Load(int catacomb, int level)
 
 			labMatrix[9] = new int[12]{ 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1 };
 
+=======
+
+			labMatrix[3] = new int[12]{ 1, 2, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1 };
+
+			labMatrix[4] = new int[12]{ 1, 2, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1 };
+
+			labMatrix[5] = new int[12]{ 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1 };
+
+			labMatrix[6] = new int[12]{ 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1 };
+
+			labMatrix[7] = new int[12]{ 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 };
+
+			labMatrix[8] = new int[12]{ 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1 };
+
+			labMatrix[9] = new int[12]{ 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 2, 1 };
+
+>>>>>>> origin/master
 			labMatrix[10] = new int[12]{ 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1 };
 
 			labMatrix[11] = new int[12]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1 };
@@ -157,6 +181,30 @@ void Laberynth::Load(int catacomb, int level)
 			labMatrix[11] = new int[12]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1 };
 
 			break;
+<<<<<<< HEAD
+
+		case 3:
+			//Catacumba: 1, nivel: 3
+			size.x = 14;
+			size.y = 14;
+			labMatrix = new int*[14];
+			labMatrix[0] = new int[14]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+			labMatrix[1] = new int[14]{ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
+
+			labMatrix[2] = new int[14]{ 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[3] = new int[14]{ 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[4] = new int[14]{ 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[5] = new int[14]{ 1, 0, 1, 0, 1, 11, 1, 1, 0, 1, 13, 1, 0, 1 };
+
+			labMatrix[6] = new int[14]{ 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[7] = new int[14]{ 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+=======
 
 		case 3:
 			//Catacumba: 1, nivel: 3
@@ -214,10 +262,49 @@ void Laberynth::Load(int catacomb, int level)
 
 			labMatrix[7] = new int[14]{ 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
 
+>>>>>>> origin/master
 			labMatrix[8] = new int[14]{ 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
 
 			labMatrix[9] = new int[14]{ 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
 
+<<<<<<< HEAD
+			labMatrix[10] = new int[14]{ 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[11] = new int[14]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1 };
+
+			labMatrix[12] = new int[14]{ 1, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 1 };
+
+			labMatrix[13] = new int[14]{ 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+			break;
+
+		case 4:
+			//Catacumba: 1, nivel: 4
+			size.x = 14;
+			size.y = 14;
+			labMatrix = new int*[14];
+			labMatrix[0] = new int[14]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+			labMatrix[1] = new int[14]{ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
+
+			labMatrix[2] = new int[14]{ 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[3] = new int[14]{ 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[4] = new int[14]{ 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[5] = new int[14]{ 1, 0, 1, 0, 1, 11, 1, 1, 0, 1, 0, 1, 14, 1 };
+
+			labMatrix[6] = new int[14]{ 1, 0, 1, 0, 1, 0, 1, 1, 12, 1, 0, 1, 0, 1 };
+
+			labMatrix[7] = new int[14]{ 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[8] = new int[14]{ 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+			labMatrix[9] = new int[14]{ 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+
+=======
+>>>>>>> origin/master
 			labMatrix[10] = new int[14]{ 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 4 };
 
 			labMatrix[11] = new int[14]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1 };
@@ -418,6 +505,10 @@ void Laberynth::Load(int catacomb, int level)
 	}
 
 	findFields();
+}
+
+void Laberynth::setField(int x, int y, int value) {
+	labMatrix[x][y] = value;
 }
 
 int Laberynth::field(int x, int y)
