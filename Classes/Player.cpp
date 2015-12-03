@@ -51,3 +51,44 @@ void Player::stepBackward()
 		Position.y -= Direction.y;
 	}
 }
+
+float Player::GetBattery()
+{
+	return battery;
+}
+
+void Player::RefillBattery() { battery = 100; }
+
+void Player::AddBattery(float quantity)
+{
+	battery += quantity;
+	if (battery > 100) battery = 100;
+	else if (battery < 0) battery = 0;
+}
+
+void Player::AddBullets(int tipo, int quantity)
+{
+	bullets[tipo] += quantity;
+}
+
+void Player::AddBengalas(int color, int quantity)
+{
+	bengalas[color] += quantity;
+}
+
+int Player::BulletsCount(int tipo) { return bullets[tipo]; }
+
+int Player::BengalasCount(int color) { return bengalas[color]; }
+
+void Player::GenerarObjetos(Player* p) {
+	//RefillBattery();
+	p->AddBattery(25);
+	srand(time(NULL));
+	for (int i = 0; i < 4; i++) {
+		probabilidadBengalas = rand() % 2 + 1; // numero entre 1 y 2;
+		probabilidadBalas = rand() % 2 + 1; // numero entre 1 y 2;
+		if (probabilidadBengalas == 1) p->AddBengalas(i, 1);
+		if (probabilidadBalas == 1) p->AddBullets(i, 1);
+	}
+
+}

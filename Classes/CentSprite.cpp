@@ -1,7 +1,7 @@
 #include "cocos2d.h"
 #include "CentSprite.h"
 #include "MyFunctions.h"
-#include "Vector2.h"
+#include "Vector2F.h"
 
 CentSprite::CentSprite(const char* spriteFile, float _x, float _y, float _width, float _height)
 {
@@ -108,9 +108,9 @@ void CentSprite::SetSize(float _width, float _height)
 	sprite->setScaleY(scaleY);
 }
 
-Vector2 CentSprite::GetPosition() { return Vector2(x, y); }
+Vector2F CentSprite::GetPosition() { return Vector2F(x, y); }
 
-Vector2 CentSprite::GetSize() { return Vector2(x, y); }
+Vector2F CentSprite::GetSize() { return Vector2F(width, height); }
 
 void CentSprite::SetOpacity(GLubyte opacity) { sprite->setOpacity(opacity); }
 

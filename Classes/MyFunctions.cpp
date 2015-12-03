@@ -29,10 +29,15 @@ void MyFunctions::SetSprite(cocos2d::Sprite* sprite, float x, float y, float wid
 
 bool MyFunctions::IsIn(int x, int y, CentSprite* cs)
 {
-	if (x < cs->GetPosition().x) return false;
-	if (x > cs->GetPosition().x + cs->GetSize().x) return false;
-	if (y < cs->GetPosition().y) return false;
-	if (y > cs->GetPosition().y + cs->GetSize().y) return false;
+	auto director = Director::getInstance();
+	Size screenSize = director->getVisibleSize();
+	float percentageX = (float)x * 100 / screenSize.width; // x = z%Screen.width  z = x*100 / Screen.width
+	float percentageY = (float)y * 100 / screenSize.height;
+
+	if (percentageX < cs->GetPosition().x) return false;
+	if (percentageX > cs->GetPosition().x + cs->GetSize().x) return false;
+	if (percentageY < cs->GetPosition().y) return false;
+	if (percentageY > cs->GetPosition().y+ cs->GetSize().y) return false;
 
 	return true;
 }

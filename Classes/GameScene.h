@@ -8,6 +8,7 @@
 #include "Enemy.h"
 #include "Vector2F.h"
 #include <vector>
+#include "Sound.h"
 
 USING_NS_CC;
 
@@ -19,11 +20,16 @@ private:
 
 	Label* debugg;
 	Laberynth laberynth;
+	Player player;
+	Player* p = &player;
+	//Sound sound;
 
 	// PlayerControl
-	Player player;
 	void checkPlayerDirections();
 	void loadPlayer();
+
+	void CheckWin();
+	void CheckMochila();
 
 	// for weapon
 	Sprite* cross;

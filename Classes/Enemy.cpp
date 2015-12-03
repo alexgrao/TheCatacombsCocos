@@ -177,6 +177,9 @@ void Enemy::Load(int id)
 
 		break;
 
+	default:
+		Load(1);
+
 	}
 }
 
@@ -298,12 +301,22 @@ void Enemy::UpdateSprite()
 	sprite->SetSize(Size.x, Size.y);
 }
 
-void Enemy::NotVisible()
+void Enemy::SetVisible(bool isVisible)
 {
-	sprite->SetPosition(200, 200);
-	currentPosition->Set(-1, -1);
-	currentSize->Set(-1, -1);
+	if (!isVisible)
+	{
+		sprite->SetPosition(200, 200);
+		currentPosition->Set(-1, -1);
+		currentSize->Set(-1, -1);
+		visible = false;
+	}
+	else
+	{
+		visible = true;
+	}
 }
+
+bool Enemy::IsVisible() { return visible; }
 
 void Enemy::SetScreenPositions(int id)
 {

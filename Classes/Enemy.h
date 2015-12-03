@@ -28,6 +28,7 @@ private:
 	Vector2F* oldPosition, *currentPosition, *diffPosition;
 	Vector2F* oldSize, *currentSize, *diffSize;
 	Vector2* distanceToCamera;
+	bool visible = false;
 
 public:
 	// variables
@@ -67,7 +68,8 @@ public:
 	// Funciones para animacion
 	void SetDistanceToCamera(int, int);
 	void UpdateSprite();
-	void NotVisible();
+	void SetVisible(bool);
+	bool IsVisible();
 	void SetScreenPositions(int);
 	void InitVectors();
 	Vector2 DistanceToCamera();
